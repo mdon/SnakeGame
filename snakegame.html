@@ -1,0 +1,230 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+<script>
+var mouseX = 0;
+var mouseY = 0;
+var canvas = "";
+var ctx = "";
+var horizontalCount = 20;
+var verticalCount = 20;
+var blockWidth, blockHeight;
+var food = [];
+var initialFoodCount = 10;
+var snake = [];
+var snakeLength = 1; 
+var snakeX = 0;
+var snakeY = 0;
+var snakeDirection = 0;
+
+var cherry = new Image();
+cherry.src = 'cherry.png';
+
+function init() {
+   canvas = document.getElementById("c1");
+   ctx = canvas.getContext("2d");
+
+   // filling the field with random food
+   for (var y=0; y<verticalCount; y++) {
+      food[y] = new Array(horizontalCount);
+   }
+
+   for (var i=0;i<initialFoodCount; i++) {
+      food[Math.floor(Math.random() * verticalCount)][Math.floor(Math.random() * horizontalCount)] = 1;
+   }
+
+   // init snake
+   for (var y=0; y<verticalCount; y++) {
+      snake[y] = new Array(horizontalCount);
+   }
+
+   snakeX = Math.floor(Math.random()*horizontalCount);
+   snakeY = Math.floor(Math.random()*verticalCount);   
+
+   snake[snakeY][snakeX] = 1;
+
+   canvas.addEventListener('mousemove', function (e) {
+      mouseX = e.pageX - canvas.offsetLeft;
+      mouseY = e.pageY - canvas.offsetTop;
+   }, 0);
+
+   ctx.font = "11pt Calibri";
+   ctx.strokeStyle = "red";
+
+   window.addEventListener('keydown', function (e) {
+      var toY, toX;
+
+      if (e.keyCode == 38) {         // up
+         snakeDirection = 4; 
+         toY = snakeY - 1;
+         toX = snakeX;
+      } else if (e.keyCode == 40) {  // down
+         snakeDirection = 2; 
+         toY = snakeY + 1;
+         toX = snakeX;
+      } else if (e.keyCode == 37) {  // left
+         snakeDirection = 1; 
+         toY = snakeY;
+         toX = snakeX - 1;
+      } else if (e.keyCode == 39) {  // right
+         snakeDirection = 3; 
+         toY = snakeY;
+         toX = snakeX + 1;
+      }
+      
+      moveThere(toY, toX);
+   },true);
+   
+   recalculate();
+   setInterval(draw, 10);
+   
+   setInterval(auto_move, 500);
+}  
+   
+function moveThere(toY, toX) {
+   if (canSnakeMoveThere(snakeY, snakeX, toY, toX)) {
+      // switch on block in a new place
+      snake[toY][toX] = 1;
+         
+   if(snakeLength == 1) {
+      // turn off tail
+      
+      if (food[toY][toX] != 1) {
+	 snake[snakeY][snakeX] = 0;
+      } else {
+	 snake[snakeY][snakeX] = 2;
+      } else {
+	 // look for tail and turn it off
+	 var largest = 0;
+	 var largestY = -1;
+	 var largestX = -1;
+	       
+	 for (var y=0; y<verticalCount; y++) {
+	    for (var x=0; x<horizontalCount; x++) {
+	       if(snake[y][x] > largest) {
+		  largest = snake[y][x];
+		  largestY = y;
+		  largestX = x;
+		  //console.log('found tail at y:' + y + '| x:' + x + '| largest:' + largest);
+	       }
+	    }
+	 }
+
+	 if (food[toY][toX] != 1) {
+	    snake[largestY][largestX] = 0;
+	 } else {
+	    snake[largestY][largestX] = snakeLength;
+	 }
+
+	 for (var y=0; y<verticalCount; y++) {
+	    for (var x=0; x<horizontalCount; x++) {
+	       if(snake[y][x] > 0) {
+		  //console.log('if - y: ' + y + ' | x:' + x + ' | toY: ' + toY + ' | toX: ' + toX);
+		  if (y == toY && x == toX) {
+		     //console.log('this is head, we are skipping');
+		  } else {
+		     snake[y][x]++;
+		     //console.log('re-numbering at y:' + y + '| x:' + x);
+		  }
+	       }
+	    }
+	 }
+      }
+      
+      snakeY = toY;
+      snakeX = toX;
+   }
+
+   //makeing shure that it doesn't cravl on it self
+   if(snakeX = snake[toY][toX] >= 1 && snakeY = snake[toY][toX] >= 1) {
+      
+   }    
+}
+   
+function canSnakeMoveThere(fromY, fromX, toY, toX) {
+   //console.log('toY:' + toY + ' toX:' + toX + ' fromY:' + fromY + ' fromX:' + fromX);
+   if(toX > horizontalCount-1 || toX < 0 || toY < 0 || toY > verticalCount-1) {
+      return false;
+   }  
+}  
+ 
+  
+function auto_move() {
+   if(snakeDirection == 4) {
+      // moving up
+      moveThere(snakeY-1, snakeX);
+      console.log('auto_moving up');
+   } else if(snakeDirection == 3) {
+      // moving right
+      moveThere(snakeY, snakeX+1);
+      console.log('auto_moving right'); 
+   } else if(snakeDirection == 2) {
+      // moving down
+      moveThere(snakeY+1, snakeX);
+      console.log('auto_moving down');
+   } else if(snakeDirection == 1) {
+      // moving left
+      moveThere(snakeY, snakeX-1);
+      console.log('auto_moving left');
+   } else if(snakeDirection == 0) {
+      console.log('auto_moving no where')
+   }
+}
+
+function recalculate() {
+   blockWidth = canvas.width/horizontalCount;
+   blockHeight = canvas.height/verticalCount;
+}
+
+function draw() {
+   canvas.width=canvas.width;
+   for (var y=0; y<verticalCount; y++) {
+      for (var x=0; x<horizontalCount; x++) {	 
+         // calculate block coordinates
+         // ---
+
+         var rectX = Math.ceil(x*blockWidth)+0.5;
+         var rectY = Math.ceil(y*blockHeight)+0.5;
+
+         ctx.beginPath();
+         ctx.rect(rectX, rectY, blockWidth, blockHeight);
+         var color = "black";
+         ctx.strokeStyle = color;
+         ctx.fillStyle = color;
+         ctx.closePath();
+
+         //if(mouseX > x*blockWidth && mouseX < x*blockWidth+blockWidth && mouseY > y*blockHeight && mouseY < y*blockHeight+blockHeight) {
+         if(snake[y][x]) {
+            ctx.fill();
+         }
+         ctx.strokeStyle = "gray"; 
+         ctx.stroke();
+
+         if(snake[y][x]>-1) ctx.strokeText(snake[y][x], rectX+blockWidth/2, rectY+blockHeight/2);
+      }
+   }
+
+   for (var y=0; y<verticalCount; y++) {
+      for (var x=0; x<horizontalCount; x++) {	 
+         if(food[y][x]) {
+            ctx.drawImage(cherry,Math.ceil(x*blockWidth)+3, Math.ceil(y*blockHeight)+3);
+         }
+
+         if(food[snakeY][snakeX] == 1) {
+            food[snakeY][snakeX] = 0;
+            food[Math.floor(Math.random() * verticalCount)][Math.floor(Math.random() * horizontalCount)] = 1;
+            snakeLength++;
+         }
+      }
+   }
+
+   
+}
+
+</script>
+</head>
+
+<body onload="init()">
+<canvas id="c1" width=600 height=600></canvas>
+</body>
