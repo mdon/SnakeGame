@@ -83,7 +83,8 @@ function init() {
 }  
    
 function moveThere(toY, toX) {
-   if (canSnakeMoveThere(snakeY, snakeX, toY, toX)) {
+      //console.log('this part works');
+      if (canSnakeMoveThere(snakeY, snakeX, toY, toX)) {
       // switch on block in a new place
       snake[toY][toX] = 1;
          
@@ -137,8 +138,8 @@ function moveThere(toY, toX) {
       snakeX = toX;
    }
 
-   //makeing shure that it doesn't cravl on it self
-   //if(snakeX = snake[toY][toX] >= 1 && snakeY = snake[toY][toX] >= 1) {
+   //making sure that it doesn't go on it self
+   //if(snakeX == snake[toY][toX] >= 1 && snakeY = snake[toY][toX] >= 1) {
       
    //}    
 }
@@ -147,7 +148,9 @@ function canSnakeMoveThere(fromY, fromX, toY, toX) {
    //console.log('toY:' + toY + ' toX:' + toX + ' fromY:' + fromY + ' fromX:' + fromX);
    if(toX > horizontalCount-1 || toX < 0 || toY < 0 || toY > verticalCount-1) {
       return false;
-   }  
+   } else {  
+      return true;
+   }
 }  
  
   
