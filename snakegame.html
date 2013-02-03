@@ -39,8 +39,8 @@ function init() {
       snake[y] = new Array(horizontalCount);
    }
 
-   snakeX = Math.floor(Math.random()*horizontalCount);
-   snakeY = Math.floor(Math.random()*verticalCount);   
+   snakeX = Math.floor(Math.random() * horizontalCount);
+   snakeY = Math.floor(Math.random() * verticalCount);   
 
    snake[snakeY][snakeX] = 1;
 
@@ -87,13 +87,14 @@ function moveThere(toY, toX) {
       // switch on block in a new place
       snake[toY][toX] = 1;
          
-   if(snakeLength == 1) {
-      // turn off tail
+      if(snakeLength == 1) {
+         // turn off tail
       
-      if (food[toY][toX] != 1) {
-	 snake[snakeY][snakeX] = 0;
-      } else {
-	 snake[snakeY][snakeX] = 2;
+         if (food[toY][toX] != 1) {
+	    snake[snakeY][snakeX] = 0;
+         } else {
+	    snake[snakeY][snakeX] = 2;
+         }
       } else {
 	 // look for tail and turn it off
 	 var largest = 0;
@@ -137,9 +138,9 @@ function moveThere(toY, toX) {
    }
 
    //makeing shure that it doesn't cravl on it self
-   if(snakeX = snake[toY][toX] >= 1 && snakeY = snake[toY][toX] >= 1) {
+   //if(snakeX = snake[toY][toX] >= 1 && snakeY = snake[toY][toX] >= 1) {
       
-   }    
+   //}    
 }
    
 function canSnakeMoveThere(fromY, fromX, toY, toX) {
