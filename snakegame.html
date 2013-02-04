@@ -3,6 +3,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
 <script>
+"use strict";
+
 var mouseX = 0;
 var mouseY = 0;
 var canvas = "";
@@ -83,11 +85,27 @@ function init() {
 }  
    
 function moveThere(toY, toX) {
-      //console.log('this part works');
-      if (canSnakeMoveThere(snakeY, snakeX, toY, toX)) {
+   //console.log('this part works');
+   if (canSnakeMoveThere(snakeY, snakeX, toY, toX)) {
       // switch on block in a new place
+      //making sure that it doesn't go on it self
+      if(snake[toY][toX] > 0) {
+         var cellThatWeAreStepingOn = snake[toY][toX];
+         console.log('stepping on ' + cellThatWeAreStepingOn  + ' tail cell');
+         for(var y = 0; y < verticalCount; y++) {
+            for(var x = 0; x < horizontalCount; x++) {
+               if(snake[y][x] > cellThatWeAreStepingOn){
+                  snake[y][x] = 0;
+                  food[y][x] = 1;
+               }
+            }  
+         }
+
+         snakeLength = cellThatWeAreStepingOn-1;
+      }
+
       snake[toY][toX] = 1;
-         
+   
       if(snakeLength == 1) {
          // turn off tail
       
@@ -138,11 +156,7 @@ function moveThere(toY, toX) {
       snakeX = toX;
    }
 
-   //making sure that it doesn't go on it self
-   //if(snakeX == snake[toY][toX] >= 1 && snakeY = snake[toY][toX] >= 1) {
-      
-   //}    
-}
+   }
    
 function canSnakeMoveThere(fromY, fromX, toY, toX) {
    //console.log('toY:' + toY + ' toX:' + toX + ' fromY:' + fromY + ' fromX:' + fromX);
@@ -231,4 +245,4 @@ function draw() {
 
 <body onload="init()">
 <canvas id="c1" width=600 height=600></canvas>
-</body>
+</body>"
