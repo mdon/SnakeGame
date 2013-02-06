@@ -172,21 +172,16 @@ function auto_move() {
    if(snakeDirection == 4) {
       // moving up
       moveThere(snakeY-1, snakeX);
-      console.log('auto_moving up');
    } else if(snakeDirection == 3) {
       // moving right
       moveThere(snakeY, snakeX+1);
-      console.log('auto_moving right'); 
    } else if(snakeDirection == 2) {
       // moving down
       moveThere(snakeY+1, snakeX);
-      console.log('auto_moving down');
    } else if(snakeDirection == 1) {
       // moving left
       moveThere(snakeY, snakeX-1);
-      console.log('auto_moving left');
    } else if(snakeDirection == 0) {
-      console.log('auto_moving no where')
    }
 }
 
@@ -219,7 +214,7 @@ function draw() {
          ctx.strokeStyle = "gray"; 
          ctx.stroke();
 
-         if(snake[y][x]>-1) ctx.strokeText(snake[y][x], rectX+blockWidth/2, rectY+blockHeight/2);
+         //if(snake[y][x]>-1) ctx.strokeText(snake[y][x], rectX+blockWidth/2, rectY+blockHeight/2);
       }
    }
 
