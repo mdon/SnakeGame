@@ -19,6 +19,7 @@ var snakeLength = 1;
 var snakeX = 0;
 var snakeY = 0;
 var snakeDirection = 0;
+var state = 0; // 0 - main menu; 1 - plaing; 2 - game over
 
 var cherry = new Image();
 cherry.src = 'cherry.png';
@@ -53,6 +54,15 @@ function init() {
 
    ctx.font = "11pt Calibri";
    ctx.strokeStyle = "red";
+
+   canvas.addEventListener('mousedown', function(e) {
+      var mouseX = e.pageX - canvas.offsetLeft;
+      var mouseY = e.pageY - canvas.offsetTop;
+      if(mouseX > 280 && mouseY > 240 && mouseX < 452 && mouseY < 310 && state == 0) {
+         state = 1;
+         console.log('mouseX - ' + mouseX + ' mouseY - ' + mouseY);
+      }      
+   }, 0);
 
    window.addEventListener('keydown', function (e) {
       var toY, toX;
@@ -155,8 +165,7 @@ function moveThere(toY, toX) {
       snakeY = toY;
       snakeX = toX;
    }
-
-   }
+}
    
 function canSnakeMoveThere(fromY, fromX, toY, toX) {
    //console.log('toY:' + toY + ' toX:' + toX + ' fromY:' + fromY + ' fromX:' + fromX);
@@ -192,45 +201,63 @@ function recalculate() {
 
 function draw() {
    canvas.width=canvas.width;
-   for (var y=0; y<verticalCount; y++) {
-      for (var x=0; x<horizontalCount; x++) {	 
-         // calculate block coordinates
-         // ---
 
-         var rectX = Math.ceil(x*blockWidth)+0.5;
-         var rectY = Math.ceil(y*blockHeight)+0.5;
+   if (state == 0) {
+      // draw main menu
+      ctx.font = "70pt Calibri";
+      ctx.strokeStyle = "red";
+      ctx.fillText('Pocket Snake',100,200);
+      ctx.font = "60pt Calibri";
+      ctx.fillText('Start',290,300);
+      ctx.strokeRect(280,240,170,70);
+   } else if (state == 1) {
+      // playing
+      for (var y=0; y<verticalCount; y++) {
+	 for (var x=0; x<horizontalCount; x++) {	 
+	    // calculate block coordinates
+	    // ---
 
-         ctx.beginPath();
-         ctx.rect(rectX, rectY, blockWidth, blockHeight);
-         var color = "black";
-         ctx.strokeStyle = color;
-         ctx.fillStyle = color;
-         ctx.closePath();
+	    var rectX = Math.ceil(x*blockWidth)+0.5;
+	    var rectY = Math.ceil(y*blockHeight)+0.5;
 
-         //if(mouseX > x*blockWidth && mouseX < x*blockWidth+blockWidth && mouseY > y*blockHeight && mouseY < y*blockHeight+blockHeight) {
-         if(snake[y][x]) {
-            ctx.fill();
-         }
-         ctx.strokeStyle = "gray"; 
-         ctx.stroke();
+	    ctx.beginPath();
+	    ctx.rect(rectX, rectY, blockWidth, blockHeight);
+	    var color = "black";
+	    ctx.strokeStyle = color;
+	    ctx.fillStyle = color;
+	    ctx.closePath();
 
-         //if(snake[y][x]>-1) ctx.strokeText(snake[y][x], rectX+blockWidth/2, rectY+blockHeight/2);
+	    //if(mouseX > x*blockWidth && mouseX < x*blockWidth+blockWidth && mouseY > y*blockHeight && mouseY < y*blockHeight+blockHeight) {
+	    if(snake[y][x]) {
+	       ctx.fill();
+	    }
+	    ctx.strokeStyle = "gray"; 
+	    ctx.stroke();
+
+	    //if(snake[y][x]>-1) ctx.strokeText(snake[y][x], rectX+blockWidth/2, rectY+blockHeight/2);
+	 }
       }
+
+      for (var y=0; y<verticalCount; y++) {
+	 for (var x=0; x<horizontalCount; x++) {	 
+	    if(food[y][x]) {
+	       ctx.drawImage(cherry,Math.ceil(x*blockWidth)+3, Math.ceil(y*blockHeight)+3);
+	    }
+
+	    if(food[snakeY][snakeX] == 1) {
+	       food[snakeY][snakeX] = 0;
+	       food[Math.floor(Math.random() * verticalCount)][Math.floor(Math.random() * horizontalCount)] = 1;
+	       snakeLength++;
+	    }
+	 }
+      }
+   } else if (state == 2) {
+      // game over
+   } else { 
+      // strange, unknown state
+      console.log('strange, unknown state, the state is:' + state);
    }
 
-   for (var y=0; y<verticalCount; y++) {
-      for (var x=0; x<horizontalCount; x++) {	 
-         if(food[y][x]) {
-            ctx.drawImage(cherry,Math.ceil(x*blockWidth)+3, Math.ceil(y*blockHeight)+3);
-         }
-
-         if(food[snakeY][snakeX] == 1) {
-            food[snakeY][snakeX] = 0;
-            food[Math.floor(Math.random() * verticalCount)][Math.floor(Math.random() * horizontalCount)] = 1;
-            snakeLength++;
-         }
-      }
-   }
 
    
 }
