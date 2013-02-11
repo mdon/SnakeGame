@@ -165,14 +165,28 @@ function moveThere(toY, toX) {
       snakeY = toY;
       snakeX = toX;
 
+      // cheking if we are eating the cherry, if yes, then generate a new spot for the cherry,
       if(food[snakeY][snakeX] == 1) {
          food[snakeY][snakeX] = 0;
-         food[Math.floor(Math.random() * verticalCount)][Math.floor(Math.random() * horizontalCount)] = 1;
+
+         // putting new cherry on the field when eaten
+         var foodPlaced = 0;
+         for(var x=0; x<10 && foodPlaced == 0; x++) {
+            var cordY = Math.floor(Math.random() * horizontalCount);
+            var cordX = Math.floor(Math.random() * verticalCount);
+
+            if(snake[cordY][cordX] > 0) {
+               console.log("can't place food at cordY: " + cordY + "| cordX: " + cordX + " will try again");
+            } else {
+               food[cordY][cordX] = 1;
+               foodPlaced = 1;
+            }
+         }
          snakeLength++;
       }
    }
 }
-   
+
 function canSnakeMoveThere(fromY, fromX, toY, toX) {
    //console.log('toY:' + toY + ' toX:' + toX + ' fromY:' + fromY + ' fromX:' + fromX);
    if(toX > horizontalCount-1 || toX < 0 || toY < 0 || toY > verticalCount-1) {
@@ -181,9 +195,9 @@ function canSnakeMoveThere(fromY, fromX, toY, toX) {
    } else {  
       return true;
    }
-}  
- 
-  
+}
+
+
 function auto_move() {
    if(snakeDirection == 4) {
       // moving up
