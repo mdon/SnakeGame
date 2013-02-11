@@ -80,22 +80,23 @@ function init() {
          toY = snakeY;
          toX = snakeX + 1;
       }
-   }   
+   }
       //moveThere(toY, toX);
    },true);
 
-  
+
    recalculate();
    setInterval(draw, 10);
-} 
-   
+}
+
 function moveThere(toY, toX) {
    //console.log('this part works');
    if (canSnakeMoveThere(snakeY, snakeX, toY, toX)) {
-      // switch on block in a new place
-      //making sure that it doesn't go on it self
+
+      // eating tail so that it turns in to apples 
       if(snake[toY][toX] > 0) {
          var cellThatWeAreStepingOn = snake[toY][toX];
+
          console.log('stepping on ' + cellThatWeAreStepingOn  + ' tail cell');
          for(var y = 0; y < verticalCount; y++) {
             for(var x = 0; x < horizontalCount; x++) {
@@ -103,62 +104,72 @@ function moveThere(toY, toX) {
                   snake[y][x] = 0;
                   food[y][x] = 1;
                }
-            }  
+            }
          }
 
+         // making the snakeLenght variable to the correct number
          snakeLength = cellThatWeAreStepingOn-1;
       }
 
+      // moving the head to the next block
       snake[toY][toX] = 1;
-   
+
       if(snakeLength == 1) {
-         // turn off tail
-      
+         // cheking if where we are steping has food. if yes, we are making snake longer
+         // and if not, we just swithing off where we used to be.
          if (food[toY][toX] != 1) {
-	    snake[snakeY][snakeX] = 0;
+            snake[snakeY][snakeX] = 0;
          } else {
-	    snake[snakeY][snakeX] = 2;
+            snake[snakeY][snakeX] = 2;
+            //snakeLength = 2;
          }
       } else {
-	 // look for tail and turn it off
-	 var largest = 0;
-	 var largestY = -1;
-	 var largestX = -1;
-	       
-	 for (var y=0; y<verticalCount; y++) {
-	    for (var x=0; x<horizontalCount; x++) {
-	       if(snake[y][x] > largest) {
-		  largest = snake[y][x];
-		  largestY = y;
-		  largestX = x;
-		  //console.log('found tail at y:' + y + '| x:' + x + '| largest:' + largest);
-	       }
-	    }
-	 }
+         // looking for the tail
+         var largest = 0;
+         var largestY = -1;
+         var largestX = -1;
 
-	 if (food[toY][toX] != 1) {
-	    snake[largestY][largestX] = 0;
-	 } else {
-	    snake[largestY][largestX] = snakeLength;
-	 }
+         for (var y=0; y<verticalCount; y++) {
+            for (var x=0; x<horizontalCount; x++) {
+               if(snake[y][x] > largest) {
+                  largest = snake[y][x];
+                  largestY = y;
+                  largestX = x;
+                  //console.log('found tail at y:' + y + '| x:' + x + '| largest:' + largest);
+               }
+            }
+         }
 
-	 for (var y=0; y<verticalCount; y++) {
-	    for (var x=0; x<horizontalCount; x++) {
-	       if(snake[y][x] > 0) {
-		  //console.log('if - y: ' + y + ' | x:' + x + ' | toY: ' + toY + ' | toX: ' + toX);
-		  if (y == toY && x == toX) {
-		     //console.log('this is head, we are skipping');
-		  } else {
-		     snake[y][x]++;
-		     //console.log('re-numbering at y:' + y + '| x:' + x);
-		  }
-	       }
-	    }
-	 }
+         // turning the tail off
+         if (food[toY][toX] != 1) {
+            snake[largestY][largestX] = 0;
+         } else {
+            snake[largestY][largestX] = snakeLength;
+         }
+
+         // re-numbering the snake, every thing exept the head
+         for (var y=0; y<verticalCount; y++) {
+            for (var x=0; x<horizontalCount; x++) {
+               if(snake[y][x] > 0) {
+                  if (y == toY && x == toX) {
+                     //console.log('this is head, we are skipping');
+                  } else {
+                     snake[y][x]++;
+                     //console.log('re-numbering at y:' + y + '| x:' + x);
+                  }
+               }
+            }
+         }
       }
-      
+
       snakeY = toY;
       snakeX = toX;
+
+      if(food[snakeY][snakeX] == 1) {
+         food[snakeY][snakeX] = 0;
+         food[Math.floor(Math.random() * verticalCount)][Math.floor(Math.random() * horizontalCount)] = 1;
+         snakeLength++;
+      }
    }
 }
    
@@ -240,11 +251,6 @@ function draw() {
 	       ctx.drawImage(cherry,Math.ceil(x*blockWidth)+3, Math.ceil(y*blockHeight)+3);
 	    }
 
-	    if(food[snakeY][snakeX] == 1) {
-	       food[snakeY][snakeX] = 0;
-	       food[Math.floor(Math.random() * verticalCount)][Math.floor(Math.random() * horizontalCount)] = 1;
-	       snakeLength++;
-	    }
 	 }
       }
    } else if (state == 2) {
