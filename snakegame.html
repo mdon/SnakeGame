@@ -2,9 +2,17 @@
 
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+<style>
+body {
+   overflow:hidden;
+   padding: 0px;
+   margin: 0px;
+}
+</style>
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 <script>
 "use strict";
-
+var pixelRatio = 1;
 var mouseX = 0;
 var mouseY = 0;
 var canvas = "";
@@ -20,6 +28,7 @@ var snakeX = 0;
 var snakeY = 0;
 var snakeDirection = 0;
 var state = 0; // 0 - main menu; 1 - plaing; 2 - game over
+var borderSpacing = 23;
 
 var cherry = new Image();
 cherry.src = 'cherry.png';
@@ -27,6 +36,14 @@ cherry.src = 'cherry.png';
 function init() {
    canvas = document.getElementById("c1");
    ctx = canvas.getContext("2d");
+
+   var backingStoreRatio = ctx.webkitBackingStorePixelRatio ||
+                           ctx.mozBackingStorePixelRatio ||
+                           ctx.msBackingStorePixelRatio ||
+                           ctx.oBackingStorePixelRatio ||
+                           ctx.backingStorePixelRatio;
+
+   pixelRatio = window.devicePixelRatio || 1;
 
    canvas.addEventListener('mousemove', function (e) {
       mouseX = e.pageX - canvas.offsetLeft;
@@ -49,7 +66,6 @@ function init() {
          }
       } else if (state == 1) {
          // we are in the game
-         setInterval(auto_move, 500);
       } else if (state == 2) {
          // we are in the game over screen
          snakeDirection = 0;
@@ -87,6 +103,7 @@ function init() {
 
    recalculate();
    setInterval(draw, 10);
+   setInterval(auto_move, 500);
 }
 
 function moveThere(toY, toX) {
@@ -195,6 +212,9 @@ function canSnakeMoveThere(fromY, fromX, toY, toX) {
    } else {  
       return true;
    }
+   //if(
+
+
 }
 
 
@@ -216,8 +236,19 @@ function auto_move() {
 }
 
 function recalculate() {
-   blockWidth = canvas.width/horizontalCount;
-   blockHeight = canvas.height/verticalCount;
+   canvas.style.width  = document.body.clientWidth;
+   canvas.style.height = document.body.clientHeight;
+   canvas.width        = document.body.clientWidth;
+   canvas.height       = document.body.clientHeight;
+
+   if (pixelRatio > 1) {
+      canvas.setAttribute('width', canvas.width * pixelRatio);
+      canvas.setAttribute('height', canvas.height * pixelRatio);
+      context.scale(pixelRatio, pixelRatio);
+   }
+
+   blockWidth = (canvas.width-borderSpacing*2)/horizontalCount;
+   blockHeight = (canvas.height-borderSpacing*2)/verticalCount;
 }
 
 function draw() {
@@ -233,47 +264,57 @@ function draw() {
       ctx.strokeRect(280,240,170,70);
    } else if (state == 1) {
       // playing
+      ctx.fillStyle = "#2cba30";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#79d87b";
+      ctx.fillRect(borderSpacing, borderSpacing, canvas.width-borderSpacing*2, canvas.height-borderSpacing*2);
+
       for (var y=0; y<verticalCount; y++) {
-	 for (var x=0; x<horizontalCount; x++) {	 
-	    // calculate block coordinates
-	    // ---
+         for (var x=0; x<horizontalCount; x++) {
+            // calculate block coordinates
+            var rectX = Math.ceil(x*blockWidth)+0.5;
+            var rectY = Math.ceil(y*blockHeight)+0.5;
 
-	    var rectX = Math.ceil(x*blockWidth)+0.5;
-	    var rectY = Math.ceil(y*blockHeight)+0.5;
+            ctx.beginPath();
+            ctx.fillStyle = "white";
+            ctx.rect(rectX+borderSpacing, rectY+borderSpacing, blockWidth, blockHeight);
+//            var color = "black";
+//            ctx.strokeStyle = color;
+//            ctx.fillStyle = color;
+//            ctx.closePath();
 
-	    ctx.beginPath();
-	    ctx.rect(rectX, rectY, blockWidth, blockHeight);
-	    var color = "black";
-	    ctx.strokeStyle = color;
-	    ctx.fillStyle = color;
-	    ctx.closePath();
+            //if(mouseX > x*blockWidth && mouseX < x*blockWidth+blockWidth && mouseY > y*blockHeight && mouseY < y*blockHeight+blockHeight) {
+            if(snake[y][x]) {
+               ctx.strokeStyle = "white"; 
+               ctx.fill();
+            } else {
+               ctx.strokeStyle = "#79d87b"; 
+            }
 
-	    //if(mouseX > x*blockWidth && mouseX < x*blockWidth+blockWidth && mouseY > y*blockHeight && mouseY < y*blockHeight+blockHeight) {
-	    if(snake[y][x]) {
-	       ctx.fill();
-	    }
-	    ctx.strokeStyle = "gray"; 
-	    ctx.stroke();
+            ctx.stroke();
 
-	    //if(snake[y][x]>-1) ctx.strokeText(snake[y][x], rectX+blockWidth/2, rectY+blockHeight/2);
-	 }
+            //if(snake[y][x]>-1) ctx.strokeText(snake[y][x], rectX+blockWidth/2, rectY+blockHeight/2);
+         }
       }
 
       for (var y=0; y<verticalCount; y++) {
-	 for (var x=0; x<horizontalCount; x++) {	 
-	    if(food[y][x]) {
-	       ctx.drawImage(cherry,Math.ceil(x*blockWidth)+3, Math.ceil(y*blockHeight)+3);
-	    }
-
-	 }
+         for (var x=0; x<horizontalCount; x++) {
+            if(food[y][x]) {
+               ctx.drawImage(cherry,Math.ceil(x*blockWidth)+3+borderSpacing, Math.ceil(y*blockHeight)+3+borderSpacing);
+            }
+         }
       }
+      ctx.fillStyle = "red";
+      ctx.font = "15pt Calibri";
+      ctx.fillText('length: ' + snakeLength, 10, canvas.height-5);
    } else if (state == 2) {
       // game over
       ctx.font = "70pt Calibri";
       ctx.strokeStyle = "red";
       ctx.fillText('The End',100,200);
       ctx.font = "40pt Calibri";
-      ctx.fillText('Your Length: ' + snakeLength,100,250);
+      ctx.fillText('Your Length was: ' + snakeLength,100,250);
       ctx.font = "20pt Calibri";
       ctx.fillText('click any where to get back to main menu',100,300);
    } else { 
@@ -307,6 +348,6 @@ function newGame() {
 </script>
 </head>
 
-<body onload="init()">
+<body onload="init()" onresize="recalculate()">
 <canvas id="c1" width=600 height=600></canvas>
 </body>
