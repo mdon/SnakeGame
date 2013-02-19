@@ -17,9 +17,10 @@ var mouseX = 0;
 var mouseY = 0;
 var canvas = "";
 var ctx = "";
-var horizontalCount = 20;
-var verticalCount = 20;
-var blockWidth, blockHeight;
+var horizontalCount = 10;
+var verticalCount = 10;
+var blockWidth = 30;
+var blockHeight = 30;
 var food = [];
 var initialFoodCount = 10;
 var snake = [];
@@ -78,36 +79,38 @@ function init() {
    window.addEventListener('keydown', function (e) {
       var toY, toX;
 
-   if(state == 1) {  
-      if (e.keyCode == 38) {         // up
-         if (snakeDirection != 2) {
-            snakeDirection = 4; 
-            toY = snakeY - 1;
-            toX = snakeX;
-         }
-      } else if (e.keyCode == 40) {  // down
-         if (snakeDirection != 4) {
-           snakeDirection = 2; 
-           toY = snakeY + 1;
-           toX = snakeX;
-         }
-      } else if (e.keyCode == 37) {  // left
-         if (snakeDirection != 3) {
-           snakeDirection = 1; 
-           toY = snakeY;
-           toX = snakeX - 1;
-         }
-      } else if (e.keyCode == 39) {  // right
-         if (snakeDirection != 1) {
-            snakeDirection = 3; 
-            toY = snakeY;
-            toX = snakeX + 1;
+      if(state == 1) {
+         if (e.keyCode == 38) {         // up
+            if (snakeDirection != 2 && snakeDirection != 4) {
+               snakeDirection = 4;
+               toY = snakeY - 1;
+               toX = snakeX;
+               moveThere(toY, toX);
+            }
+         } else if (e.keyCode == 40) {  // down
+            if (snakeDirection != 4 && snakeDirection != 2) {
+               snakeDirection = 2;
+               toY = snakeY + 1;
+               toX = snakeX;
+               moveThere(toY, toX);
+            }
+         } else if (e.keyCode == 37) {  // left
+            if (snakeDirection != 3 && snakeDirection != 1) {
+               snakeDirection = 1;
+               toY = snakeY;
+               toX = snakeX - 1;
+               moveThere(toY, toX);
+            }
+         } else if (e.keyCode == 39) {  // right
+            if (snakeDirection != 1 && snakeDirection != 3) {
+               snakeDirection = 3;
+               toY = snakeY;
+               toX = snakeX + 1;
+               moveThere(toY, toX);
+            }
          }
       }
-   }
-      //moveThere(toY, toX);
    },true);
-
 
    recalculate();
    setInterval(draw, 10);
@@ -197,10 +200,10 @@ function moveThere(toY, toX) {
          // putting new cherry on the field when eaten
          var foodPlaced = 0;
          for(var x=0; x<10 && foodPlaced == 0; x++) {
-            var cordY = Math.floor(Math.random() * horizontalCount);
-            var cordX = Math.floor(Math.random() * verticalCount);
+            var cordY = Math.floor(Math.random() * verticalCount);
+            var cordX = Math.floor(Math.random() * horizontalCount);
 
-            if(snake[cordY][cordX] > 0) {
+            if(snake[cordY][cordX] && snake[cordY][cordX] > 0) {
                console.log("can't place food at cordY: " + cordY + "| cordX: " + cordX + " will try again");
             } else {
                food[cordY][cordX] = 1;
@@ -253,8 +256,8 @@ function recalculate() {
       context.scale(pixelRatio, pixelRatio);
    }
 
-   blockWidth = (canvas.width-borderSpacing*2)/horizontalCount;
-   blockHeight = (canvas.height-borderSpacing*2)/verticalCount;
+   horizontalCount = Math.floor((canvas.width - (borderSpacing*2)) / blockWidth);
+   verticalCount = Math.floor((canvas.height - (borderSpacing*2)) / blockHeight);
 }
 
 function draw() {
@@ -270,6 +273,9 @@ function draw() {
       ctx.strokeRect(280,240,170,70);
    } else if (state == 1) {
       // playing
+      ctx.fillStyle = "red";
+      ctx.rect(borderSpacing,borderSpacing,80,80);
+
       ctx.fillStyle = "#2cba30";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -314,6 +320,9 @@ function draw() {
       ctx.fillStyle = "red";
       ctx.font = "15pt Calibri";
       ctx.fillText('length: ' + snakeLength, 10, canvas.height-5);
+
+      ctx.fillStyle = "red";
+      ctx.rect(borderSpacing,borderSpacing,80,80);
    } else if (state == 2) {
       // game over
       ctx.font = "70pt Calibri";
@@ -354,6 +363,6 @@ function newGame() {
 </script>
 </head>
 
-<body onload="init()" onresize="recalculate()">
+<body onload="init()">
 <canvas id="c1" width=600 height=600></canvas>
 </body>
