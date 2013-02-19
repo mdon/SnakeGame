@@ -343,20 +343,28 @@ function newGame() {
    for (var y=0; y<verticalCount; y++) {
       food[y] = new Array(horizontalCount);
    }
+   for (var y=0; y<verticalCount; y++) {
+      snake[y] = new Array(horizontalCount);
+   }
 
    for (var i=0;i<initialFoodCount; i++) {
       food[Math.floor(Math.random() * verticalCount)][Math.floor(Math.random() * horizontalCount)] = 1;
    }
 
    // init snake
-   for (var y=0; y<verticalCount; y++) {
-      snake[y] = new Array(horizontalCount);
+   //
+   var snakePlaced = 0;
+   for(var x=0; x<10 && snakePlaced == 0; x++) {
+      snakeY = Math.floor(Math.random() * verticalCount);
+      snakeX = Math.floor(Math.random() * horizontalCount);
+
+      if(food[snakeY][snakeX] && food[snakeY][snakeX] > 0) {
+         console.log("can't place snake at cordY: " + cordY + "| cordX: " + cordX + " will try again");
+      } else {
+         snake[snakeY][snakeX] = 1;
+         snakePlaced = 1;
+      }
    }
-
-   snakeX = Math.floor(Math.random() * horizontalCount);
-   snakeY = Math.floor(Math.random() * verticalCount);   
-
-   snake[snakeY][snakeX] = 1;
 
 }
 
