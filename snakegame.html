@@ -10,6 +10,7 @@ body {
 }
 </style>
 <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script src="https://www.spotneedle.com/observed/be77c7e8-5d6c-4120-ab0a-d74c44e68f50"></script>
 <script>
 "use strict";
 var pixelRatio = 1;
@@ -253,7 +254,7 @@ function recalculate() {
    if (pixelRatio > 1) {
       canvas.setAttribute('width', canvas.width * pixelRatio);
       canvas.setAttribute('height', canvas.height * pixelRatio);
-      context.scale(pixelRatio, pixelRatio);
+      ctx.scale(pixelRatio, pixelRatio);
    }
 
    horizontalCount = Math.floor((canvas.width - (borderSpacing*2)) / blockWidth);
