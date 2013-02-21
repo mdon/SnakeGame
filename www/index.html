@@ -2,6 +2,7 @@
 
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+<meta name="apple-mobile-web-app-capable" content="yes" />
 <style>
 body {
    overflow:hidden;
@@ -9,8 +10,9 @@ body {
    margin: 0px;
 }
 </style>
-<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-<script src="https://www.spotneedle.com/observed/be77c7e8-5d6c-4120-ab0a-d74c44e68f50"></script>
+<script src="cordova-2.4.0.js"></script>
+<script src="jquery-1.9.1.min.js"></script>
+<script src="https://www.spotneedle.com/observed/b1c56867-4397-48d5-820e-dc9592c1f383"></script>
 <script>
 "use strict";
 var pixelRatio = 1;
@@ -39,13 +41,17 @@ function init() {
    canvas = document.getElementById("c1");
    ctx = canvas.getContext("2d");
 
-   var backingStoreRatio = ctx.webkitBackingStorePixelRatio ||
-                           ctx.mozBackingStorePixelRatio ||
-                           ctx.msBackingStorePixelRatio ||
-                           ctx.oBackingStorePixelRatio ||
-                           ctx.backingStorePixelRatio;
-
    pixelRatio = window.devicePixelRatio || 1;
+
+   if (pixelRatio > 1) {
+      blockWidth = blockWidth*pixelRatio;
+      blockHeight = blockHeight*pixelRatio;
+   }
+
+   // to prevent page scrolling on touch devices
+   document.ontouchmove = function(e) {
+      e.preventDefault();
+   }
 
    canvas.addEventListener('mousemove', function (e) {
       mouseX = e.pageX - canvas.offsetLeft;
@@ -227,7 +233,6 @@ function canSnakeMoveThere(fromY, fromX, toY, toX) {
 
 }
 
-
 function auto_move() {
    if(snakeDirection == 4) {
       // moving up
@@ -268,15 +273,13 @@ function draw() {
       // draw main menu
       ctx.font = "70pt Calibri";
       ctx.strokeStyle = "red";
-      ctx.fillText('Pocket Snake',100,200);
+      ctx.fillText('Pocket Snake', 100*pixelRatio, 200*pixelRatio);
+
       ctx.font = "60pt Calibri";
-      ctx.fillText('Start',290,300);
-      ctx.strokeRect(280,240,170,70);
+      ctx.fillText('Start', 290*pixelRatio, 300*pixelRatio);
+      ctx.strokeRect(280*pixelRatio, 240*pixelRatio, 170*pixelRatio, 70*pixelRatio);
    } else if (state == 1) {
       // playing
-      ctx.fillStyle = "red";
-      ctx.rect(borderSpacing,borderSpacing,80,80);
-
       ctx.fillStyle = "#2cba30";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
