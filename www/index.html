@@ -16,24 +16,30 @@
    <script src="http://debug.phonegap.com/target/target-script-min.js#pocketsnake"></script>
 <script>
 "use strict";
-var pixelRatio = 1;
-var mouseX = 0;
-var mouseY = 0;
-var canvas = "";
-var ctx = "";
-var horizontalCount = 10;
-var verticalCount = 10;
-var blockWidth = 30;
-var blockHeight = 30;
-var food = [];
-var initialFoodCount = 10;
-var snake = [];
-var snakeLength = 1; 
-var snakeX = 0;
-var snakeY = 0;
-var snakeDirection = 0;
-var state = 0; // 0 - main menu; 1 - plaing; 2 - game over
-var borderSpacing = 23;
+
+var pixelRatio       = 1
+,   mouseX           = 0
+,   mouseY           = 0
+,   canvas           = ""
+,   ctx              = ""
+,   horizontalCount  = 10
+,   verticalCount    = 10
+,   blockWidth       = 30
+,   blockHeight      = 30
+,   food             = []
+,   initialFoodCount = 10
+,   snake            = []
+,   snakeLength      = 1
+,   snakeX           = 0
+,   snakeY           = 0
+,   snakeDirection   = 0
+,   state            = 0   // 0 - main menu; 1 - plaing; 2 - game over
+,   borderSpacing    = 23
+,   touchStartX      = 0   // touch sceen variables |
+,   touchStartY      = 0   //                       |
+,   touchEndedX      = 0   //                       |
+,   touchEndedY      = 0   //                       v
+;
 
 var food = new Image();
 
@@ -88,46 +94,135 @@ function init() {
          newGame();
       }
    }, 0);
+   
+   canvas.addEventListener('touchstart', function(e) {
+      touchStartX = e.pageX - canvas.offsetLeft;
+      touchStartY = e.pageY - canvas.offsetTop;
+      //console.log('touch start at ' + touchX + ' x ' + touchY);
+   }, 0);
+
+   canvas.addEventListener('touchmove', function(e) {
+      touchEndedX = e.pageX - canvas.offsetLeft;
+      touchEndedY = e.pageY - canvas.offsetTop;
+
+      var xDiff = touchStartX - touchEndedX
+      ,   yDiff = touchStartY - touchEndedY
+      ;
+
+      if (Math.abs(xDiff) > 20 || Math.abs(yDiff) > 20) {
+         if (Math.abs(xDiff) > Math.abs(yDiff)) {
+            if (xDiff < 0) {
+               moveRight();
+            } else {
+               moveLeft();
+            }
+         } else {
+            if (yDiff < 0) {
+               moveDown();
+            } else {
+               moveUp();
+            }
+         }
+         
+         touchStartX = e.pageX - canvas.offsetLeft;
+         touchStartY = e.pageY - canvas.offsetTop;
+      } else {
+         //console.log("ignoring gesture because it is too small");
+      }
+            
+      //console.log('touch move at ' + touchX + ' x ' + touchY);
+   }, 0);
+   
+   canvas.addEventListener('touchend', function(e) {
+      var xDiff = touchStartX - touchEndedX
+      ,   yDiff = touchStartY - touchEndedY
+      ;
+      
+      //console.log("touchended, processing... (xDiff:" + xDiff + ", yDiff:" + yDiff + ")");
+      
+      if (Math.abs(xDiff) > 10 || Math.abs(yDiff) > 10) {
+         if (Math.abs(xDiff) > Math.abs(yDiff)) {
+            if (xDiff < 0) {
+               moveRight();
+            } else {
+               moveLeft();
+            }
+         } else {
+            if (yDiff < 0) {
+               moveDown();
+            } else {
+               moveUp();
+            }
+         }
+      } else {
+         //console.log("ignoring gesture because it is too small");
+      }
+      
+      //if (xDiff != Math.abs(yDiff) && xDiff > yDiff) {
+      //   moveRight();
+      //} else if (yDiff != Math.abs(yDiff) && yDiff > xDiff) {
+      //   moveDown();
+      //} else if(xDiff > yDiff) {
+      //   moveLeft();
+      //} else if (yDiff > xDiff) {
+      //   moveUp();
+      //}
+      
+      //console.log('xDiff ' + xDiff);
+      //console.log('yDiff ' + yDiff);
+      //console.log('touchEndedX ' + touchEndedX);
+      //console.log('touchEndedY ' + touchEndedY);
+      
+      //console.log('touch ended');
+   }, 0);
 
    window.addEventListener('keydown', function (e) {
       var toY, toX;
 
       if(state == 1) {
-         if (e.keyCode == 38) {         // up
-            if (snakeDirection != 2 && snakeDirection != 4) {
-               snakeDirection = 4;
-               toY = snakeY - 1;
-               toX = snakeX;
-               moveThere(toY, toX);
-            }
-         } else if (e.keyCode == 40) {  // down
-            if (snakeDirection != 4 && snakeDirection != 2) {
-               snakeDirection = 2;
-               toY = snakeY + 1;
-               toX = snakeX;
-               moveThere(toY, toX);
-            }
-         } else if (e.keyCode == 37) {  // left
-            if (snakeDirection != 3 && snakeDirection != 1) {
-               snakeDirection = 1;
-               toY = snakeY;
-               toX = snakeX - 1;
-               moveThere(toY, toX);
-            }
-         } else if (e.keyCode == 39) {  // right
-            if (snakeDirection != 1 && snakeDirection != 3) {
-               snakeDirection = 3;
-               toY = snakeY;
-               toX = snakeX + 1;
-               moveThere(toY, toX);
-            }
+         if (e.keyCode == 38) {         
+            moveUp();
+         } else if (e.keyCode == 40) {  
+            moveDown();
+         } else if (e.keyCode == 37) {  
+            moveLeft();
+         } else if (e.keyCode == 39) {  
+            moveRight();
          }
       }
-   },true);
+   }, true);
 
    recalculate();
    setInterval(draw, 10);
-   setInterval(auto_move, 500);
+   setInterval(auto_move, 400);
+}
+
+function moveUp() {
+   if (snakeDirection != 2 && snakeDirection != 4) {
+      snakeDirection = 4;
+      moveThere(snakeY - 1, snakeX);
+   }
+}
+
+function moveDown() {
+   if (snakeDirection != 4 && snakeDirection != 2) {
+      snakeDirection = 2;
+      moveThere(snakeY + 1, snakeX);
+   }
+}
+
+function moveRight() {
+   if (snakeDirection != 1 && snakeDirection != 3) {
+      snakeDirection = 3;
+      moveThere(snakeY, snakeX + 1);
+   }
+}
+
+function moveLeft() {
+   if (snakeDirection != 3 && snakeDirection != 1) {
+      snakeDirection = 1;
+      moveThere(snakeY, snakeX - 1);
+   }
 }
 
 function moveThere(toY, toX) {
