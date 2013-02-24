@@ -3,12 +3,25 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
 <meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+<meta name="msapplication-tap-highlight" content="no"/>
 <style>
+   * {
+      /* disable selections / cut copy paste actions */
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color:rgba(0,0,0,0);
+   }
+
    body {
       overflow:hidden;
       padding: 0px;
       margin: 0px;
       background-color: #dadada;
+   }
+   
+   #c1 {
+      /* border: 1px solid black; */
    }
 </style>
 <script src="cordova-2.4.0.js"></script>
