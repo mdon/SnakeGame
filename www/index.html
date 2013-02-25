@@ -30,29 +30,31 @@
 <script>
 "use strict";
 
-var pixelRatio       = 1
-,   mouseX           = 0
-,   mouseY           = 0
-,   canvas           = ""
-,   ctx              = ""
-,   horizontalCount  = 10
-,   verticalCount    = 10
-,   blockWidth       = 15
-,   blockHeight      = 15
-,   food             = []
-,   initialFoodCount = 10
-,   snake            = []
-,   snakeLength      = 1
-,   snakeX           = 0
-,   snakeY           = 0
-,   snakeDirection   = 0
-,   state            = 0   // 0 - main menu; 1 - plaing; 2 - game over
-,   borderSpacing    = 23
-,   touchStartX      = 0   // touch sceen variables |
-,   touchStartY      = 0   //                       |
-,   touchEndedX      = 0   //                       |
-,   touchEndedY      = 0   //                       v
-,   lastFrameDraw    = 0
+var pixelRatio          = 1
+,   mouseX              = 0
+,   mouseY              = 0
+,   canvas              = ""
+,   ctx                 = ""
+,   horizontalCount     = 10
+,   verticalCount       = 10
+,   blockWidth          = 15
+,   blockHeight         = 15
+,   food                = []
+,   initialFoodCount    = 10
+,   snake               = []
+,   snakeLength         = 1
+,   snakeX              = 0
+,   snakeY              = 0
+,   snakeDirection      = 0
+,   state               = 0   // 0 - main menu; 1 - plaing; 2 - game over
+,   borderSpacing       = 10
+,   touchStartX         = 0   // touch sceen variables |
+,   touchStartY         = 0   //                       |
+,   touchEndedX         = 0   //                       |
+,   touchEndedY         = 0   //                       v
+,   lastFrameDraw       = 0
+,   lastTimeMovedThere  = 0
+,   autoMoveInterval    = 200
 ;
 
 var food = new Image();
@@ -250,38 +252,42 @@ function init() {
    recalculate();
    //setInterval(draw, 10);
    draw();
-   setInterval(auto_move, 400);
+   setInterval(auto_move, autoMoveInterval);
 }
 
 function moveUp() {
    if (snakeDirection != 2 && snakeDirection != 4) {
       snakeDirection = 4;
-      moveThere(snakeY - 1, snakeX);
+      moveThere(snakeY - 1, snakeX, 1);
    }
 }
 
 function moveDown() {
    if (snakeDirection != 4 && snakeDirection != 2) {
       snakeDirection = 2;
-      moveThere(snakeY + 1, snakeX);
+      moveThere(snakeY + 1, snakeX, 1);
    }
 }
 
 function moveRight() {
    if (snakeDirection != 1 && snakeDirection != 3) {
       snakeDirection = 3;
-      moveThere(snakeY, snakeX + 1);
+      moveThere(snakeY, snakeX + 1, 1);
    }
 }
 
 function moveLeft() {
    if (snakeDirection != 3 && snakeDirection != 1) {
       snakeDirection = 1;
-      moveThere(snakeY, snakeX - 1);
+      moveThere(snakeY, snakeX - 1, 1);
    }
 }
 
-function moveThere(toY, toX) {
+function moveThere(toY, toX, human) {
+   if (+new Date - lastTimeMovedThere < autoMoveInterval && !human) {
+      return;
+   }
+
    //console.log('this part works');
    if (canSnakeMoveThere(snakeY, snakeX, toY, toX)) {
 
@@ -377,6 +383,8 @@ function moveThere(toY, toX) {
          snakeLength++;
       }
    }
+   
+   lastTimeMovedThere = +new Date;
 }
 
 function canSnakeMoveThere(fromY, fromX, toY, toX) {
@@ -393,16 +401,16 @@ function canSnakeMoveThere(fromY, fromX, toY, toX) {
 function auto_move() {
    if(snakeDirection == 4) {
       // moving up
-      moveThere(snakeY-1, snakeX);
+      moveThere(snakeY-1, snakeX, 0);
    } else if(snakeDirection == 3) {
       // moving right
-      moveThere(snakeY, snakeX+1);
+      moveThere(snakeY, snakeX+1, 0);
    } else if(snakeDirection == 2) {
       // moving down
-      moveThere(snakeY+1, snakeX);
+      moveThere(snakeY+1, snakeX, 0);
    } else if(snakeDirection == 1) {
       // moving left
-      moveThere(snakeY, snakeX-1);
+      moveThere(snakeY, snakeX-1, 0);
    } else if(snakeDirection == 0) {
    }
 }
@@ -442,7 +450,7 @@ function draw() {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ctx.fillStyle = "#79d87b";
-      ctx.fillRect(borderSpacing, borderSpacing, canvas.width-borderSpacing*2, canvas.height-borderSpacing*2);
+      ctx.fillRect(borderSpacing, borderSpacing, canvas.width-borderSpacing*2, canvas.height-borderSpacing*4);
 
       for (var y=0; y<verticalCount; y++) {
          for (var x=0; x<horizontalCount; x++) {
@@ -480,8 +488,8 @@ function draw() {
          }
       }
       
-      ctx.fillStyle = "red";
-      ctx.font = "15pt Calibri";
+      ctx.fillStyle = "white";
+      ctx.font = "13pt Calibri";
       ctx.fillText('Length: ' + snakeLength, 10, canvas.height-5);
 
       // display frame frate in the corner
