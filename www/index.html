@@ -37,8 +37,8 @@ var pixelRatio       = 1
 ,   ctx              = ""
 ,   horizontalCount  = 10
 ,   verticalCount    = 10
-,   blockWidth       = 30
-,   blockHeight      = 30
+,   blockWidth       = 15
+,   blockHeight      = 15
 ,   food             = []
 ,   initialFoodCount = 10
 ,   snake            = []
@@ -52,9 +52,51 @@ var pixelRatio       = 1
 ,   touchStartY      = 0   //                       |
 ,   touchEndedX      = 0   //                       |
 ,   touchEndedY      = 0   //                       v
+,   lastFrameDraw    = 0
 ;
 
 var food = new Image();
+
+// http://creativejs.com/resources/requestanimationframe/
+// https://gist.github.com/paulirish/1579671
+// https://gist.github.com/rma4ok/3371337
+// requestAnimationFrame polyfill by @rma4ok
+!function (window) {
+   var
+      equestAnimationFrame = 'equestAnimationFrame',
+      requestAnimationFrame = 'r' + equestAnimationFrame,
+ 
+      ancelAnimationFrame = 'ancelAnimationFrame',
+      cancelAnimationFrame = 'c' + ancelAnimationFrame,
+ 
+      expectedTime = 0,
+      vendors = ['moz', 'ms', 'o', 'webkit'],
+      vendor;
+ 
+      while (!window[requestAnimationFrame] && (vendor = vendors.pop())) {
+         window[requestAnimationFrame] = window[vendor + 'R' + equestAnimationFrame];
+         window[cancelAnimationFrame] =
+         window[vendor + 'C' + ancelAnimationFrame] ||
+         window[vendor + 'CancelR' + equestAnimationFrame];
+      }
+ 
+      if (!window[requestAnimationFrame]) {
+         window[requestAnimationFrame] = function (callback) {
+            var
+               currentTime = +new Date,
+               adjustedDelay = 16 - (currentTime - expectedTime),
+               delay = adjustedDelay > 0 ? adjustedDelay : 0;
+ 
+               expectedTime = currentTime + delay;
+ 
+            return setTimeout(function () {
+               callback(expectedTime);
+            }, delay);
+      };
+ 
+      window[cancelAnimationFrame] = clearTimeout;
+   }
+}(this);
 
 function init() {
 
@@ -206,7 +248,8 @@ function init() {
    }, true);
 
    recalculate();
-   setInterval(draw, 10);
+   //setInterval(draw, 10);
+   draw();
    setInterval(auto_move, 400);
 }
 
@@ -381,7 +424,8 @@ function recalculate() {
 }
 
 function draw() {
-   canvas.width=canvas.width;
+   window.requestAnimationFrame(draw);
+   canvas.width = canvas.width;
 
    if (state == 0) {
       // draw main menu
@@ -431,17 +475,22 @@ function draw() {
       for (var y=0; y<verticalCount; y++) {
          for (var x=0; x<horizontalCount; x++) {
             if(food[y][x]) {
-               ctx.drawImage(food, Math.ceil(x*blockWidth)+borderSpacing, Math.ceil(y*blockHeight)+borderSpacing, food.width, food.height);
+               ctx.drawImage(food, Math.ceil(x*blockWidth)+borderSpacing, Math.ceil(y*blockHeight)+borderSpacing, food.width/2, food.height/2);
             }
          }
       }
       
       ctx.fillStyle = "red";
       ctx.font = "15pt Calibri";
-      ctx.fillText('length: ' + snakeLength, 10, canvas.height-5);
+      ctx.fillText('Length: ' + snakeLength, 10, canvas.height-5);
 
-      ctx.fillStyle = "red";
-      ctx.rect(borderSpacing,borderSpacing,80,80);
+      // display frame frate in the corner
+      // ctx.fillStyle = "white";
+      // ctx.font = "10pt Calibri";
+      // ctx.fillText('fps: ' + Math.floor(1000 / ((+new Date) - lastFrameDraw)), canvas.width - 50, canvas.height-5);
+
+      //ctx.fillStyle = "red";
+      //ctx.rect(borderSpacing, borderSpacing, 80, 80);
    } else if (state == 2) {
       // game over
       ctx.font = "70pt Calibri";
@@ -455,6 +504,8 @@ function draw() {
       // strange, unknown state
       console.log('strange, unknown state, the state is:' + state);
    }
+   
+   lastFrameDraw = +new Date;
 }
 
 function newGame() {
