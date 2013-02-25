@@ -115,8 +115,6 @@ function init() {
       food.src = 'food-01.png';
    }
    
-   //alert(cherry);
-
    // to prevent page scrolling on touch devices
    document.ontouchmove = function(e) {
       e.preventDefault();
@@ -137,9 +135,9 @@ function init() {
       if (state == 0) {
          // we are in a main menu
          if (mouseX > 280 && mouseY > 240 && mouseX < 452 && mouseY < 310) {
-            newGame(); 
+            newGame();
+            console.log(snakeDirection);
             state = 1;
-            console.log('mouseX - ' + mouseX + ' mouseY - ' + mouseY);
          }
       } else if (state == 1) {
          // we are in the game
@@ -215,22 +213,6 @@ function init() {
          //console.log("ignoring gesture because it is too small");
       }
       
-      //if (xDiff != Math.abs(yDiff) && xDiff > yDiff) {
-      //   moveRight();
-      //} else if (yDiff != Math.abs(yDiff) && yDiff > xDiff) {
-      //   moveDown();
-      //} else if(xDiff > yDiff) {
-      //   moveLeft();
-      //} else if (yDiff > xDiff) {
-      //   moveUp();
-      //}
-      
-      //console.log('xDiff ' + xDiff);
-      //console.log('yDiff ' + yDiff);
-      //console.log('touchEndedX ' + touchEndedX);
-      //console.log('touchEndedY ' + touchEndedY);
-      
-      //console.log('touch ended');
    }, 0);
 
    window.addEventListener('keydown', function (e) {
@@ -388,30 +370,33 @@ function moveThere(toY, toX, human) {
 }
 
 function canSnakeMoveThere(fromY, fromX, toY, toX) {
-   //console.log('toY:' + toY + ' toX:' + toX + ' fromY:' + fromY + ' fromX:' + fromX);
-   if(toX > horizontalCount-1 || toX < 0 || toY < 0 || toY > verticalCount-1) {
-      state = 2;
-      return false;
-   } else {
-      return true;
+   if (state == 1) {
+      //console.log('toY:' + toY + ' toX:' + toX + ' fromY:' + fromY + ' fromX:' + fromX);
+      if(toX > horizontalCount-1 || toX < 0 || toY < 0 || toY > verticalCount-1) {
+         state = 2; // game over
+         return false;
+      } else {
+         return true;
+      }
    }
-
 }
 
 function auto_move() {
-   if(snakeDirection == 4) {
-      // moving up
-      moveThere(snakeY-1, snakeX, 0);
-   } else if(snakeDirection == 3) {
-      // moving right
-      moveThere(snakeY, snakeX+1, 0);
-   } else if(snakeDirection == 2) {
-      // moving down
-      moveThere(snakeY+1, snakeX, 0);
-   } else if(snakeDirection == 1) {
-      // moving left
-      moveThere(snakeY, snakeX-1, 0);
-   } else if(snakeDirection == 0) {
+   if (state == 1) {
+      if(snakeDirection == 4) {
+         // moving up
+         moveThere(snakeY-1, snakeX, 0);
+      } else if(snakeDirection == 3) {
+         // moving right
+         moveThere(snakeY, snakeX+1, 0);
+      } else if(snakeDirection == 2) {
+         // moving down
+         moveThere(snakeY+1, snakeX, 0);
+      } else if(snakeDirection == 1) {
+         // moving left
+         moveThere(snakeY, snakeX-1, 0);
+      } else if(snakeDirection == 0) {
+      }
    }
 }
 
@@ -544,6 +529,7 @@ function newGame() {
       }
    }
 
+   snakeDirection = 0;
 }
 
 </script>
