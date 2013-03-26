@@ -549,13 +549,28 @@ function draw() {
       //ctx.rect(borderSpacing, borderSpacing, 80, 80);
    } else if (state == 2) {
       // game over
-      ctx.font = "70pt Calibri";
+      var pixelRatio2 = 0;
+      if ( pixelRatio > 1) {
+         pixelRatio2 = 1;
+      } else {
+         pixelRatio2 = 2;
+      }
+      var size = 70/pixelRatio2;
+      var size2 = 40/pixelRatio2;
+      var size3 = 50/pixelRatio2;
+      
+      ctx.beginPath();
+      ctx.fillStyle = "black";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.closePath();
+      
+      ctx.font = size + "pt Calibri";
       ctx.strokeStyle = "red";
-      ctx.fillText('The End',100,200);
-      ctx.font = "40pt Calibri";
-      ctx.fillText('Your Length was: ' + snakeLength,100,250);
-      ctx.font = "20pt Calibri";
-      ctx.fillText('click any where to get back to main menu',100,300);
+      ctx.strokeText('Game Over', (canvas.width/2) - 200/pixelRatio2, 100);
+      ctx.font = size2 + "pt Calibri";
+      ctx.strokeText('Snakes length was: ' + snakeLength, (canvas.width/2) - 200/pixelRatio2, 200);
+      ctx.font = size3 + "pt Calibri";
+      ctx.strokeText('clickany where', (canvas.width/2) - 200/pixelRatio2, 300);
    } else { 
       // strange, unknown state
       console.log('strange, unknown state, the state is:' + state);
