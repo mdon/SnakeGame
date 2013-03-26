@@ -560,7 +560,7 @@ function draw() {
       var size3 = 50/pixelRatio2;
       
       ctx.beginPath();
-      ctx.fillStyle = "black";
+      ctx.fillStyle = "white";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.closePath();
       
@@ -568,9 +568,9 @@ function draw() {
       ctx.strokeStyle = "red";
       ctx.strokeText('Game Over', (canvas.width/2) - 200/pixelRatio2, 100);
       ctx.font = size2 + "pt Calibri";
-      ctx.strokeText('Snakes length was: ' + snakeLength, (canvas.width/2) - 200/pixelRatio2, 200);
+      ctx.strokeText('Snake\'s length was: ' + snakeLength, (canvas.width/2) - 200/pixelRatio2, 200);
       ctx.font = size3 + "pt Calibri";
-      ctx.strokeText('clickany where', (canvas.width/2) - 200/pixelRatio2, 300);
+      ctx.strokeText('click anywhere', (canvas.width/2) - 200/pixelRatio2, 300);
    } else { 
       // strange, unknown state
       console.log('strange, unknown state, the state is:' + state);

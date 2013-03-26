@@ -17,7 +17,7 @@
 			<key>CFBundleIconFiles</key>
 			<array>
 				<string>icon.png</string>
-				<string>icon@2x.png</string>
+				<string>Icon@2x.png</string>
 				<string>icon-72.png</string>
 				<string>icon-72@2x.png</string>
 			</array>
@@ -54,9 +54,6 @@
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 </dict>
 </plist>
