@@ -57,6 +57,8 @@ var pixelRatio          = 1
 ,   autoMoveInterval    = 200
 ,   playX               = 0
 ,   playY               = 0
+,   longIphone          = 0
+,   longIphone2         = 0
 ;
 
 var picturesToLoad = [];
@@ -166,7 +168,7 @@ function init() {
       if (state == 0) {
          // we are in a main menu
          console.log('reached this point');
-         if (mouseX > playX && mouseY > playY && mouseX < playX + loadedPictures.play.width && mouseY < playY + loadedPictures.play.height) {
+         if (mouseX > playX && mouseY > playY + longIphone2 && mouseX < playX + loadedPictures.play.width + longIphone2 && mouseY < playY + loadedPictures.play.height + longIphone2) {
             newGame();
             state = 1;
          } else {
@@ -481,9 +483,13 @@ function draw() {
       }
    } else if (state == 0) {
       // draw main menu
+      if (canvas.height > 1000) {
+         longIphone = 100;
+         longIphone2 = 200;
+      }
       ctx.drawImage(loadedPictures.logo, (canvas.width - loadedPictures.logo.width)/2 , 20);
-      ctx.drawImage(loadedPictures.snake, (canvas.width - loadedPictures.snake.width)/2, 20 + 10 + loadedPictures.logo.height);
-      ctx.drawImage(loadedPictures.play, playX, playY);
+      ctx.drawImage(loadedPictures.snake, (canvas.width - loadedPictures.snake.width)/2, 30 + loadedPictures.logo.height + longIphone);
+      ctx.drawImage(loadedPictures.play, playX, playY + longIphone2);
       
       ctx.beginPath();
       ctx.arc(mouseX, mouseY, 3, 0, 6.28);
