@@ -483,13 +483,13 @@ function draw() {
       }
    } else if (state == 0) {
       // draw main menu
-      if (canvas.height > 1000) {
+      if (canvas.height == 1136) {
          longIphone = 100;
          longIphone2 = 200;
       }
       ctx.drawImage(loadedPictures.logo, (canvas.width - loadedPictures.logo.width)/2 , 20);
       ctx.drawImage(loadedPictures.snake, (canvas.width - loadedPictures.snake.width)/2, 30 + loadedPictures.logo.height + longIphone);
-      ctx.drawImage(loadedPictures.play, playX, playY + longIphone2);
+      ctx.drawImage(loadedPictures.play, playX, playY + longIphone2 - 5);
       
       ctx.beginPath();
       ctx.arc(mouseX, mouseY, 3, 0, 6.28);
