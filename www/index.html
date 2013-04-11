@@ -26,7 +26,9 @@
 </style>
 <script src="cordova-2.4.0.js"></script>
 <script src="jquery-1.9.1.min.js"></script>
-<script src="http://debug.phonegap.com/target/target-script-min.js#pocketsnake"></script>
+<!--
+script src="http://debug.phonegap.com/target/target-script-min.js#pocketsnake"></script
+-->
 <script>
 "use strict";
 
@@ -59,6 +61,9 @@ var pixelRatio          = 1
 ,   playY               = 0
 ,   longIphone          = 0
 ,   longIphone2         = 0
+,   pixelRatio2         = 0
+,   TTDF                = 0   // Time To Draw Frame
+,   TTDFarray           = []
 ;
 
 var picturesToLoad = [];
@@ -115,9 +120,16 @@ function init() {
    ctx = canvas.getContext("2d");
 
    pixelRatio = window.devicePixelRatio || 1;
+   
+   if ( pixelRatio > 1) {
+      pixelRatio2 = 1;
+   } else {
+      pixelRatio2 = 2;
+   }
 
    recalculate();
 
+   // choosing the right food image size
    if (pixelRatio > 1) {
       blockWidth = blockWidth*pixelRatio;
       blockHeight = blockHeight*pixelRatio;
@@ -126,23 +138,28 @@ function init() {
       picturesToLoad.push({ name: "food", picture: "food-01.png" });
    }
 
-   // choosing the right size for logo, snake and play button
+   // choosing the right size for logo, snake, play button and gameover
    if (canvas.width < 400) {
-      picturesToLoad.push({ name: "play",  picture:  "play-iphone.png"      });
-      picturesToLoad.push({ name: "snake", picture:  "snake-iphone.png"     });
-      picturesToLoad.push({ name: "logo",  picture:  "logo-iphone.png"      });
+      picturesToLoad.push({ name: "play",     picture: "play-iphone.png"        });
+      picturesToLoad.push({ name: "snake",    picture: "snake-iphone.png"       });
+      picturesToLoad.push({ name: "logo",     picture: "logo-iphone.png"        });
+      picturesToLoad.push({ name: "gameover", picture: "gameover-iphone.png"    });
    } else if (canvas.width > 600 && canvas.width < 700) {
-      picturesToLoad.push({ name: "play",  picture:  "play-iphone-2x.png"   });
-      picturesToLoad.push({ name: "snake", picture:  "snake-iphone-2x.png"  });
-      picturesToLoad.push({ name: "logo",  picture:  "logo-iphone-2x.png"   });
+      picturesToLoad.push({ name: "play",     picture: "play-iphone-2x.png"     });
+      picturesToLoad.push({ name: "snake",    picture: "snake-iphone-2x.png"    });
+      picturesToLoad.push({ name: "logo",     picture: "logo-iphone-2x.png"     });
+      picturesToLoad.push({ name: "gameover", picture: "gameover-iphone-2x.png" });
    } else if (canvas.width > 700 && canvas.width < 1500) {
-      picturesToLoad.push({ name: "play",  picture:  "play-ipad.png"        });
-      picturesToLoad.push({ name: "snake", picture:  "snake-ipad.png"       });
-      picturesToLoad.push({ name: "logo",  picture:  "logo-ipad.png"        });
+      picturesToLoad.push({ name: "play",     picture: "play-ipad.png"          });
+      picturesToLoad.push({ name: "snake",    picture: "snake-ipad.png"         });
+      picturesToLoad.push({ name: "logo",     picture: "logo-ipad.png"          });
+      picturesToLoad.push({ name: "gameover", picture: "gameover-ipad.png"      });
    } else if (canvas.width > 1500) {
-      picturesToLoad.push({ name: "play",  picture:  "play-ipad-2x.png"     });
-      picturesToLoad.push({ name: "snake", picture:  "snake-ipad-2x.png"    });
-      picturesToLoad.push({ name: "logo",  picture:  "logo-ipad-2x.png"     });
+      picturesToLoad.push({ name: "play",     picture: "play-ipad-2x.png"       });
+      picturesToLoad.push({ name: "snake",    picture: "snake-ipad-2x.png"      });
+      picturesToLoad.push({ name: "logo",     picture: "logo-ipad-2x.png"       });
+      picturesToLoad.push({ name: "gameover", picture: "gameover-ipad-2x.png"   });
+
    }
    
    
@@ -167,12 +184,12 @@ function init() {
 
       if (state == 0) {
          // we are in a main menu
-         console.log('reached this point');
+         //console.log('reached this point');
          if (mouseX > playX && mouseY > playY + longIphone2 && mouseX < playX + loadedPictures.play.width + longIphone2 && mouseY < playY + loadedPictures.play.height + longIphone2) {
             newGame();
             state = 1;
          } else {
-            console.log('mouseX ' + mouseX + ' playX ' + playX + ' mouseY ' + mouseY + ' playY ' + playY);
+            //console.log('mouseX ' + mouseX + ' playX ' + playX + ' mouseY ' + mouseY + ' playY ' + playY);
          }
       } else if (state == 1) {
          // we are in the game
@@ -188,12 +205,18 @@ function init() {
    canvas.addEventListener('touchstart', function(e) {
       touchStartX = e.pageX - canvas.offsetLeft;
       touchStartY = e.pageY - canvas.offsetTop;
+      mouseX = touchStartX;
+      mouseY = touchStartY;
+      
       //console.log('touch start at ' + touchX + ' x ' + touchY);
    }, 0);
 
    canvas.addEventListener('touchmove', function(e) {
       touchEndedX = e.pageX - canvas.offsetLeft;
       touchEndedY = e.pageY - canvas.offsetTop;
+
+      mouseX = touchEndedX;
+      mouseY = touchEndedY;
 
       var xDiff = touchStartX - touchEndedX
       ,   yDiff = touchStartY - touchEndedY
@@ -266,7 +289,6 @@ function init() {
       }
    }, true);
 
-   //setInterval(draw, 10);
    draw();
    setInterval(auto_move, autoMoveInterval);
    startLoadingImages();
@@ -325,7 +347,7 @@ function moveThere(toY, toX, human) {
       if(snake[toY][toX] > 0) {
          var cellThatWeAreStepingOn = snake[toY][toX];
 
-         console.log('stepping on ' + cellThatWeAreStepingOn  + ' tail cell');
+         //console.log('stepping on ' + cellThatWeAreStepingOn  + ' tail cell');
          for(var y = 0; y < verticalCount; y++) {
             for(var x = 0; x < horizontalCount; x++) {
                if(snake[y][x] > cellThatWeAreStepingOn){
@@ -393,18 +415,18 @@ function moveThere(toY, toX, human) {
       snakeY = toY;
       snakeX = toX;
 
-      // cheking if we are eating the cherry, if yes, then generate a new spot for the cherry,
+      // cheking if we are eating the food, if yes, then generate a new spot for the cherry
       if(food[snakeY][snakeX] == 1) {
          food[snakeY][snakeX] = 0;
 
-         // putting new cherry on the field when eaten
+         // putting new food on the field when eaten
          var foodPlaced = 0;
          for(var x=0; x<10 && foodPlaced == 0; x++) {
             var cordY = Math.floor(Math.random() * verticalCount);
             var cordX = Math.floor(Math.random() * horizontalCount);
 
             if(snake[cordY][cordX] && snake[cordY][cordX] > 0) {
-               console.log("can't place food at cordY: " + cordY + "| cordX: " + cordX + " will try again");
+               //console.log("can't place food at cordY: " + cordY + "| cordX: " + cordX + " will try again");
             } else {
                food[cordY][cordX] = 1;
                foodPlaced = 1;
@@ -414,14 +436,16 @@ function moveThere(toY, toX, human) {
       }
    }
    
+   
+   
    lastTimeMovedThere = +new Date;
 }
 
 function canSnakeMoveThere(fromY, fromX, toY, toX) {
    if (state == 1) {
-      //console.log('toY:' + toY + ' toX:' + toX + ' fromY:' + fromY + ' fromX:' + fromX);
       if(toX > horizontalCount-1 || toX < 0 || toY < 0 || toY > verticalCount-1) {
          state = 2; // game over
+                  
          return false;
       } else {
          return true;
@@ -465,7 +489,9 @@ function recalculate() {
 }
 
 function draw() {
+   var drawStart = +new Date;
    window.requestAnimationFrame(draw);
+   
    canvas.width = canvas.width;
    
    if (state == -1) {      
@@ -473,7 +499,7 @@ function draw() {
          // draw loading screen
          ctx.fillStyle = "white";
          ctx.font = "20pt Calibri";
-         ctx.fillText('Pocket Snake is loading: ', (canvas.width / 2) - 50, (canvas.height / 2) - 25);
+         ctx.fillText('Pocket Snake is loading...', (canvas.width / 2) - 50, (canvas.height / 2) - 25);
       } else {
          // decide where to draw Play button
          playX = (canvas.width - loadedPictures.play.width)/2;
@@ -497,7 +523,6 @@ function draw() {
       ctx.stroke();
       ctx.closePath();
       
-      //  > playX &&  > playY && mouseX < playX + loadedPictures.play.width && mouseY < playY + loadedPictures.play.height
    } else if (state == 1) {
       // playing
       ctx.fillStyle = "#2cba30";
@@ -515,12 +540,7 @@ function draw() {
             ctx.beginPath();
             ctx.fillStyle = "white";
             ctx.rect(rectX+borderSpacing, rectY+borderSpacing, blockWidth, blockHeight);
-//            var color = "black";
-//            ctx.strokeStyle = color;
-//            ctx.fillStyle = color;
-//            ctx.closePath();
 
-            //if(mouseX > x*blockWidth && mouseX < x*blockWidth+blockWidth && mouseY > y*blockHeight && mouseY < y*blockHeight+blockHeight) {
             if(snake[y][x]) {
                ctx.strokeStyle = "white"; 
                ctx.fill();
@@ -530,7 +550,6 @@ function draw() {
 
             ctx.stroke();
 
-            //if(snake[y][x]>-1) ctx.strokeText(snake[y][x], rectX+blockWidth/2, rectY+blockHeight/2);
          }
       }
 
@@ -546,43 +565,42 @@ function draw() {
       ctx.font = "13pt Calibri";
       ctx.fillText('Length: ' + snakeLength, 10, canvas.height-5);
 
-      // display frame frate in the corner
-      // ctx.fillStyle = "white";
-      // ctx.font = "10pt Calibri";
-      // ctx.fillText('fps: ' + Math.floor(1000 / ((+new Date) - lastFrameDraw)), canvas.width - 50, canvas.height-5);
+       //display frame frate in the corner
+       //ctx.fillStyle = "white";
+       //ctx.font = "10pt Calibri";
+       //ctx.fillText('fps: ' + Math.floor(1000 / ((+new Date) - lastFrameDraw)), canvas.width - 50, canvas.height-5);
 
-      //ctx.fillStyle = "red";
-      //ctx.rect(borderSpacing, borderSpacing, 80, 80);
-   } else if (state == 2) {
-      // game over
-      var pixelRatio2 = 0;
+
       if ( pixelRatio > 1) {
          pixelRatio2 = 1;
       } else {
          pixelRatio2 = 2;
       }
-      var size = 70/pixelRatio2;
-      var size2 = 40/pixelRatio2;
-      var size3 = 50/pixelRatio2;
       
-      ctx.beginPath();
-      ctx.fillStyle = "white";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.closePath();
-      
-      ctx.font = size + "pt Calibri";
-      ctx.strokeStyle = "red";
-      ctx.strokeText('Game Over', (canvas.width/2) - 200/pixelRatio2, 100);
-      ctx.font = size2 + "pt Calibri";
-      ctx.strokeText('Snake\'s length was: ' + snakeLength, (canvas.width/2) - 200/pixelRatio2, 200);
-      ctx.font = size3 + "pt Calibri";
-      ctx.strokeText('click anywhere', (canvas.width/2) - 200/pixelRatio2, 300);
-   } else { 
+   } else if (state == 2) {
+      ctx.drawImage(loadedPictures.gameover, (canvas.width - loadedPictures.gameover.width)/2 , 20);
+
+   
+   } else {
       // strange, unknown state
-      console.log('strange, unknown state, the state is:' + state);
+      //console.log('strange, unknown state, the state is:' + state);
    }
    
    lastFrameDraw = +new Date;
+
+   TTDFarray.push(+new Date - drawStart);
+   
+   var TTDFAA = 0;
+   for(var i = 0; i < TTDFarray.length; i++) {
+      TTDFAA = TTDFarray[i] + TTDFAA;
+   }
+   
+   if (TTDFarray.length > 100) {
+      TTDFarray.shift();
+   }
+   
+   ctx.font = "8pt Calibri";
+   ctx.fillText(Math.floor(TTDFAA/TTDFarray.length) + " ms", canvas.width - 30, canvas.height-5);
 }
 
 function newGame() {
@@ -606,7 +624,7 @@ function newGame() {
       snakeX = Math.floor(Math.random() * horizontalCount);
 
       if(food[snakeY][snakeX] && food[snakeY][snakeX] > 0) {
-         console.log("can't place snake at cordY: " + cordY + "| cordX: " + cordX + " will try again");
+         //console.log("can't place snake at cordY: " + cordY + "| cordX: " + cordX + " will try again");
       } else {
          snake[snakeY][snakeX] = 1;
          snakePlaced = 1;
