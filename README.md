@@ -3,7 +3,7 @@ SnakeGame
 
 My first snake game written in JavaScript using Canvas.
 
-I'm gona post this to app store
+It was approved by Apple on April 8th, here it is: http://itunes.com/apps/pocketsnake
 
 Notes:
 - Apple icon was taken from:
