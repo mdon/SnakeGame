@@ -1,42 +1,9 @@
-<html>
+console.log("starting app...");
 
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="viewport" content="width=device-width, user-scalable=no" />
-<meta name="msapplication-tap-highlight" content="no"/>
-<style>
-   * {
-      /* disable selections / cut copy paste actions */
-      -webkit-touch-callout: none;
-      -webkit-user-select: none;
-      -webkit-tap-highlight-color:rgba(0,0,0,0);
-   }
-
-   body {
-      overflow:hidden;
-      padding: 0px;
-      margin: 0px;
-      background-color: #dadada;
-   }
-   
-   #c1 {
-      /* border: 1px solid black; */
-   }
-</style>
-<script src="cordova-2.4.0.js"></script>
-<script src="jquery-1.9.1.min.js"></script>
-<!--
-script src="http://debug.phonegap.com/target/target-script-min.js#pocketsnake"></script
--->
-<script>
-"use strict";
-
-var pixelRatio          = 1
+var pixelRatio          = 1 // kuku
 ,   mouseX              = 0
 ,   mouseY              = 0
-,   canvas              = ""
-,   ctx                 = ""
+,   ctx                 = "none"
 ,   horizontalCount     = 10
 ,   verticalCount       = 10
 ,   blockWidth          = 15
@@ -44,9 +11,12 @@ var pixelRatio          = 1
 ,   food                = []
 ,   initialFoodCount    = 10
 ,   snake               = []
+,   snake2              = []
 ,   snakeLength         = 1
 ,   snakeX              = 0
 ,   snakeY              = 0
+,   snake2X             = 0
+,   snake2Y             = 0
 ,   snakeDirection      = 0
 ,   state               = -1   //-1 - loading; 0 - main menu; 1 - plaing; 2 - game over
 ,   borderSpacing       = 10
@@ -66,168 +36,81 @@ var pixelRatio          = 1
 ,   TTDFarray           = []
 ;
 
+console.log("after variable declaration");
+
 var picturesToLoad = [];
 var loadedPictures = {};
 var loadedPicturesCounter = 0;
 
 var mouseX = 0, mouseY = 0;
 
-// http://creativejs.com/resources/requestanimationframe/
-// https://gist.github.com/paulirish/1579671
-// https://gist.github.com/rma4ok/3371337
-// requestAnimationFrame polyfill by @rma4ok
-!function (window) {
-   var
-      equestAnimationFrame = 'equestAnimationFrame',
-      requestAnimationFrame = 'r' + equestAnimationFrame,
- 
-      ancelAnimationFrame = 'ancelAnimationFrame',
-      cancelAnimationFrame = 'c' + ancelAnimationFrame,
- 
-      expectedTime = 0,
-      vendors = ['moz', 'ms', 'o', 'webkit'],
-      vendor;
- 
-      while (!window[requestAnimationFrame] && (vendor = vendors.pop())) {
-         window[requestAnimationFrame] = window[vendor + 'R' + equestAnimationFrame];
-         window[cancelAnimationFrame] =
-         window[vendor + 'C' + ancelAnimationFrame] ||
-         window[vendor + 'CancelR' + equestAnimationFrame];
-      }
- 
-      if (!window[requestAnimationFrame]) {
-         window[requestAnimationFrame] = function (callback) {
-            var
-               currentTime = +new Date,
-               adjustedDelay = 16 - (currentTime - expectedTime),
-               delay = adjustedDelay > 0 ? adjustedDelay : 0;
- 
-               expectedTime = currentTime + delay;
- 
-            return setTimeout(function () {
-               callback(expectedTime);
-            }, delay);
-      };
- 
-      window[cancelAnimationFrame] = clearTimeout;
-   }
-}(this);
+var canvas = document.getElementById('canvas');
+console.log("getting canvas");
 
+ctx = canvas.getContext("2d");
 
-function init() {
+//ctx.imageSmoothingEnabled = true;
 
-   canvas = document.getElementById("c1");
-   ctx = canvas.getContext("2d");
+console.log("before recalc");
+recalculate();
+console.log("after recalc");
 
-   pixelRatio = window.devicePixelRatio || 1;
-   
-   if ( pixelRatio > 1) {
-      pixelRatio2 = 1;
-   } else {
-      pixelRatio2 = 2;
-   }
+console.log("navigator.userAgent: " + navigator.userAgent);
 
-   recalculate();
+picturesToLoad.push({ name: "food", picture: "food-01.png" });
 
-   // choosing the right food image size
-   if (pixelRatio > 1) {
-      blockWidth = blockWidth*pixelRatio;
-      blockHeight = blockHeight*pixelRatio;
-      picturesToLoad.push({ name: "food", picture: "food-01x2.png" });
-   } else {
-      picturesToLoad.push({ name: "food", picture: "food-01.png" });
-   }
+var searchIphone = navigator.userAgent.search("iPhone");
 
-   // choosing the right size for logo, snake, play button and gameover
-   if (canvas.width < 400) {
-      picturesToLoad.push({ name: "play",     picture: "play-iphone.png"        });
-      picturesToLoad.push({ name: "snake",    picture: "snake-iphone.png"       });
-      picturesToLoad.push({ name: "logo",     picture: "logo-iphone.png"        });
-      picturesToLoad.push({ name: "gameover", picture: "gameover-iphone.png"    });
-   } else if (canvas.width > 600 && canvas.width < 700) {
-      picturesToLoad.push({ name: "play",     picture: "play-iphone-2x.png"     });
-      picturesToLoad.push({ name: "snake",    picture: "snake-iphone-2x.png"    });
-      picturesToLoad.push({ name: "logo",     picture: "logo-iphone-2x.png"     });
-      picturesToLoad.push({ name: "gameover", picture: "gameover-iphone-2x.png" });
-   } else if (canvas.width > 700 && canvas.width < 1500) {
-      picturesToLoad.push({ name: "play",     picture: "play-ipad.png"          });
-      picturesToLoad.push({ name: "snake",    picture: "snake-ipad.png"         });
-      picturesToLoad.push({ name: "logo",     picture: "logo-ipad.png"          });
-      picturesToLoad.push({ name: "gameover", picture: "gameover-ipad.png"      });
-   } else if (canvas.width > 1500) {
-      picturesToLoad.push({ name: "play",     picture: "play-ipad-2x.png"       });
-      picturesToLoad.push({ name: "snake",    picture: "snake-ipad-2x.png"      });
-      picturesToLoad.push({ name: "logo",     picture: "logo-ipad-2x.png"       });
-      picturesToLoad.push({ name: "gameover", picture: "gameover-ipad-2x.png"   });
+if (searchIphone > 0) {
+   picturesToLoad.push({ name: "play",     picture: "play-iphone.png"        });
+   picturesToLoad.push({ name: "snake",    picture: "snake-iphone.png"       });
+   picturesToLoad.push({ name: "logo",     picture: "logo-iphone.png"        });
+   picturesToLoad.push({ name: "gameover", picture: "gameover-iphone.png"    });
+}
 
-   }
-   
-   
-   
-   
-   // to prevent page scrolling on touch devices
-   document.ontouchmove = function(e) {
-      e.preventDefault();
-   }
+var searchIpad = navigator.userAgent.search("iPad");
 
-   canvas.addEventListener('mousemove', function (e) {
-      mouseX = e.pageX - canvas.offsetLeft;
-      mouseY = e.pageY - canvas.offsetTop;
-   }, 0);
+if (searchIpad > 0) {
+   initialFoodCount = initialFoodCount + 20;
+   picturesToLoad.push({ name: "play",     picture: "play-ipad.png"          });
+   picturesToLoad.push({ name: "snake",    picture: "snake-ipad.png"         });
+   picturesToLoad.push({ name: "logo",     picture: "logo-ipad.png"          });
+   picturesToLoad.push({ name: "gameover", picture: "gameover-ipad.png"      });
+}
 
-   ctx.font = "11pt Calibri";
-   ctx.strokeStyle = "red";
+canvas.addEventListener('mousemove', function (e) {
+   mouseX = e.pageX - canvas.offsetLeft;
+   mouseY = e.pageY - canvas.offsetTop;
+   console.log("mousemove()");
+}, 0);
 
-   canvas.addEventListener('mousedown', function(e) {
-      mouseX = (e.pageX - canvas.offsetLeft) * pixelRatio;
-      mouseY = (e.pageY - canvas.offsetTop) * pixelRatio;
+ctx.font = "11pt Calibri";
+ctx.strokeStyle = "red";
 
-      if (state == 0) {
-         // we are in a main menu
-         //console.log('reached this point');
-         if (mouseX > playX && mouseY > playY + longIphone2 && mouseX < playX + loadedPictures.play.width + longIphone2 && mouseY < playY + loadedPictures.play.height + longIphone2) {
-            newGame();
-            state = 1;
+canvas.addEventListener('touchstart', function(e) {
+   touchStartX = e.touches[0].pageX;
+   touchStartY = e.touches[0].pageY;
+   mouseX = touchStartX;
+   mouseY = touchStartY;
+}, 0);
+
+canvas.addEventListener('touchmove', function(e) {
+   touchEndedX = e.touches[0].pageX;
+   touchEndedY = e.touches[0].pageY;
+
+   mouseX = touchEndedX;
+   mouseY = touchEndedY;
+
+   var xDiff = touchStartX - touchEndedX
+   ,   yDiff = touchStartY - touchEndedY
+   ;
+
+   if (Math.abs(xDiff) > 20 || Math.abs(yDiff) > 20) {
+      if (Math.abs(xDiff) > Math.abs(yDiff)) {
+         if (xDiff < 0) {
+            moveRight();
          } else {
-            //console.log('mouseX ' + mouseX + ' playX ' + playX + ' mouseY ' + mouseY + ' playY ' + playY);
-         }
-      } else if (state == 1) {
-         // we are in the game
-      } else if (state == 2) {
-         // we are in the game over screen
-         snakeDirection = 0;
-         snakeLength = 1;
-         state = 0;
-         newGame();
-      }
-   }, 0);
-   
-   canvas.addEventListener('touchstart', function(e) {
-      touchStartX = e.pageX - canvas.offsetLeft;
-      touchStartY = e.pageY - canvas.offsetTop;
-      mouseX = touchStartX;
-      mouseY = touchStartY;
-      
-      //console.log('touch start at ' + touchX + ' x ' + touchY);
-   }, 0);
-
-   canvas.addEventListener('touchmove', function(e) {
-      touchEndedX = e.pageX - canvas.offsetLeft;
-      touchEndedY = e.pageY - canvas.offsetTop;
-
-      mouseX = touchEndedX;
-      mouseY = touchEndedY;
-
-      var xDiff = touchStartX - touchEndedX
-      ,   yDiff = touchStartY - touchEndedY
-      ;
-
-      if (Math.abs(xDiff) > 20 || Math.abs(yDiff) > 20) {
-         if (Math.abs(xDiff) > Math.abs(yDiff)) {
-            if (xDiff < 0) {
-               moveRight();
-            } else {
-               moveLeft();
+            moveLeft();
             }
          } else {
             if (yDiff < 0) {
@@ -237,22 +120,30 @@ function init() {
             }
          }
          
-         touchStartX = e.pageX - canvas.offsetLeft;
-         touchStartY = e.pageY - canvas.offsetTop;
+       touchStartX = e.pageX - canvas.offsetLeft;
+       touchStartY = e.pageY - canvas.offsetTop;
+    } else {
+       //console.log("ignoring gesture because it is too small");
+    }
+         
+   //console.log('touch move at ' + touchX + ' x ' + touchY);
+}, 0);
+
+canvas.addEventListener('touchend', function(e) {
+   var xDiff = touchStartX - touchEndedX
+   ,   yDiff = touchStartY - touchEndedY
+   ;
+      
+   if (state == 0) {
+      // we are in a main menu
+      //console.log('reached this point');
+      if (mouseX > playX && mouseY > playY + longIphone2 && mouseX < playX + loadedPictures.play.width + longIphone2 && mouseY < playY + loadedPictures.play.height + longIphone2) {
+         newGame();
+         state = 1;
       } else {
-         //console.log("ignoring gesture because it is too small");
+         //console.log('mouseX ' + mouseX + ' playX ' + playX + ' mouseY ' + mouseY + ' playY ' + playY);
       }
-            
-      //console.log('touch move at ' + touchX + ' x ' + touchY);
-   }, 0);
-   
-   canvas.addEventListener('touchend', function(e) {
-      var xDiff = touchStartX - touchEndedX
-      ,   yDiff = touchStartY - touchEndedY
-      ;
-      
-      //console.log("touchended, processing... (xDiff:" + xDiff + ", yDiff:" + yDiff + ")");
-      
+   } else if (state == 1) {
       if (Math.abs(xDiff) > 10 || Math.abs(yDiff) > 10) {
          if (Math.abs(xDiff) > Math.abs(yDiff)) {
             if (xDiff < 0) {
@@ -270,29 +161,23 @@ function init() {
       } else {
          //console.log("ignoring gesture because it is too small");
       }
+   } else if (state == 2) {
+      // we are in the game over screen
+      snakeDirection = 0;
+      snakeLength = 1;
+      state = 0;
+      newGame();
+   }
+
       
-   }, 0);
+   //console.log("touchended, processing... (xDiff:" + xDiff + ", yDiff:" + yDiff + ")");
+}, 0);
 
-   window.addEventListener('keydown', function (e) {
-      var toY, toX;
+draw();
+setInterval(auto_move, autoMoveInterval);
 
-      if(state == 1) {
-         if (e.keyCode == 38) {         
-            moveUp();
-         } else if (e.keyCode == 40) {  
-            moveDown();
-         } else if (e.keyCode == 37) {  
-            moveLeft();
-         } else if (e.keyCode == 39) {  
-            moveRight();
-         }
-      }
-   }, true);
+startLoadingImages();
 
-   draw();
-   setInterval(auto_move, autoMoveInterval);
-   startLoadingImages();
-}
 
 function startLoadingImages() {
    for (var i=0; i<picturesToLoad.length; i++) {
@@ -468,22 +353,12 @@ function auto_move() {
          // moving left
          moveThere(snakeY, snakeX-1, 0);
       } else if(snakeDirection == 0) {
+      
       }
    }
 }
 
 function recalculate() {
-   canvas.style.width  = document.body.clientWidth;
-   canvas.style.height = document.body.clientHeight;
-   canvas.width        = document.body.clientWidth;
-   canvas.height       = document.body.clientHeight;
-
-   if (pixelRatio > 1) {
-      canvas.setAttribute('width', canvas.width * pixelRatio);
-      canvas.setAttribute('height', canvas.height * pixelRatio);
-      ctx.scale(pixelRatio, pixelRatio);
-   }
-
    horizontalCount = Math.floor((canvas.width / pixelRatio - (borderSpacing*2)) / blockWidth);
    verticalCount = Math.floor((canvas.height / pixelRatio - (borderSpacing*2)) / blockHeight);
 }
@@ -492,7 +367,11 @@ function draw() {
    var drawStart = +new Date;
    window.requestAnimationFrame(draw);
    
-   canvas.width = canvas.width;
+   //ctx.clearRect(0, 0, canvas.width, canvas.height);
+   ctx.fillStyle = 'white';
+   ctx.fillRect(0, 0, canvas.width, canvas.height);
+   
+   
    
    if (state == -1) {      
       if (loadedPicturesCounter < picturesToLoad.length) {
@@ -514,7 +393,7 @@ function draw() {
          longIphone2 = 200;
       }
       ctx.drawImage(loadedPictures.logo, (canvas.width - loadedPictures.logo.width)/2 , 20);
-      ctx.drawImage(loadedPictures.snake, (canvas.width - loadedPictures.snake.width)/2, 30 + loadedPictures.logo.height + longIphone);
+      ctx.drawImage(loadedPictures.snake, (canvas.width - loadedPictures.snake.width)/2 , 30 + loadedPictures.logo.height + longIphone );
       ctx.drawImage(loadedPictures.play, playX, playY + longIphone2 - 5);
       
       ctx.beginPath();
@@ -531,27 +410,29 @@ function draw() {
       ctx.fillStyle = "#79d87b";
       ctx.fillRect(borderSpacing, borderSpacing, canvas.width-borderSpacing*2, (canvas.height-borderSpacing*4) + borderSpacing);
 
+      // drawing the snake
+      
       for (var y=0; y<verticalCount; y++) {
          for (var x=0; x<horizontalCount; x++) {
-            // calculate block coordinates
-            var rectX = (Math.ceil(x*blockWidth)+0.5);
-            var rectY = (Math.ceil(y*blockHeight)+0.5);
-
-            ctx.beginPath();
-            ctx.fillStyle = "white";
-            ctx.rect(rectX+borderSpacing, rectY+borderSpacing, blockWidth, blockHeight);
-
+            
             if(snake[y][x]) {
-               ctx.strokeStyle = "white"; 
+               // calculate block coordinates
+               var rectX = (Math.ceil(x*blockWidth)+0.5);
+               var rectY = (Math.ceil(y*blockHeight)+0.5);
+
+               ctx.beginPath();
+               ctx.fillStyle = "white";
+            ctx.rect(rectX+borderSpacing, rectY+borderSpacing, blockWidth, blockHeight);
                ctx.fill();
+               ctx.closePath();
             } else {
-               ctx.strokeStyle = "#79d87b"; 
+               //ctx.strokeStyle = "#79d87b";
             }
 
-            ctx.stroke();
-
+            //ctx.stroke();
          }
       }
+      
 
       for (var y=0; y<verticalCount; y++) {
          for (var x=0; x<horizontalCount; x++) {
@@ -560,6 +441,8 @@ function draw() {
             }
          }
       }
+      
+
       
       ctx.fillStyle = "white";
       ctx.font = "13pt Calibri";
@@ -590,7 +473,8 @@ function draw() {
 
    TTDFarray.push(+new Date - drawStart);
    
-   var TTDFAA = 0;
+   var TTDFAA = 0; // ?
+   
    for(var i = 0; i < TTDFarray.length; i++) {
       TTDFAA = TTDFarray[i] + TTDFAA;
    }
@@ -633,10 +517,3 @@ function newGame() {
 
    snakeDirection = 0;
 }
-
-</script>
-</head>
-
-<body onload="init()">
-<canvas id="c1" width=100 height=100></canvas>
-</body>
