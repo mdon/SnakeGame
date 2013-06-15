@@ -3,6 +3,7 @@ console.log("starting app...");
 var pixelRatio          = 1 // kuku
 ,   mouseX              = 0
 ,   mouseY              = 0
+,   canvas              = document.getElementById('canvas')
 ,   ctx                 = "none"
 ,   horizontalCount     = 10
 ,   verticalCount       = 10
@@ -36,148 +37,100 @@ var pixelRatio          = 1 // kuku
 ,   TTDFarray           = []
 ;
 
-console.log("after variable declaration");
-
 var picturesToLoad = [];
 var loadedPictures = {};
 var loadedPicturesCounter = 0;
 
 var mouseX = 0, mouseY = 0;
 
-var canvas = document.getElementById('canvas');
-console.log("getting canvas");
-
-ctx = canvas.getContext("2d");
-
-//ctx.imageSmoothingEnabled = true;
-
-console.log("before recalc");
-recalculate();
-console.log("after recalc");
-
-console.log("navigator.userAgent: " + navigator.userAgent);
-
-picturesToLoad.push({ name: "food", picture: "food-01.png" });
-
-var searchIphone = navigator.userAgent.search("iPhone");
-
-if (searchIphone > 0) {
-   picturesToLoad.push({ name: "play",     picture: "play-iphone.png"        });
-   picturesToLoad.push({ name: "snake",    picture: "snake-iphone.png"       });
-   picturesToLoad.push({ name: "logo",     picture: "logo-iphone.png"        });
-   picturesToLoad.push({ name: "gameover", picture: "gameover-iphone.png"    });
-}
-
-var searchIpad = navigator.userAgent.search("iPad");
-
-if (searchIpad > 0) {
-   initialFoodCount = initialFoodCount + 20;
-   picturesToLoad.push({ name: "play",     picture: "play-ipad.png"          });
-   picturesToLoad.push({ name: "snake",    picture: "snake-ipad.png"         });
-   picturesToLoad.push({ name: "logo",     picture: "logo-ipad.png"          });
-   picturesToLoad.push({ name: "gameover", picture: "gameover-ipad.png"      });
-}
-
-canvas.addEventListener('mousemove', function (e) {
-   mouseX = e.pageX - canvas.offsetLeft;
-   mouseY = e.pageY - canvas.offsetTop;
-   console.log("mousemove()");
-}, 0);
-
-ctx.font = "11pt Calibri";
-ctx.strokeStyle = "red";
-
-canvas.addEventListener('touchstart', function(e) {
-   touchStartX = e.touches[0].pageX;
-   touchStartY = e.touches[0].pageY;
-   mouseX = touchStartX;
-   mouseY = touchStartY;
-}, 0);
-
-canvas.addEventListener('touchmove', function(e) {
-   touchEndedX = e.touches[0].pageX;
-   touchEndedY = e.touches[0].pageY;
-
-   mouseX = touchEndedX;
-   mouseY = touchEndedY;
-
-   var xDiff = touchStartX - touchEndedX
-   ,   yDiff = touchStartY - touchEndedY
-   ;
-
-   if (Math.abs(xDiff) > 20 || Math.abs(yDiff) > 20) {
-      if (Math.abs(xDiff) > Math.abs(yDiff)) {
-         if (xDiff < 0) {
-            moveRight();
-         } else {
-            moveLeft();
-            }
-         } else {
-            if (yDiff < 0) {
-               moveDown();
-            } else {
-               moveUp();
-            }
-         }
-         
-       touchStartX = e.pageX - canvas.offsetLeft;
-       touchStartY = e.pageY - canvas.offsetTop;
-    } else {
-       //console.log("ignoring gesture because it is too small");
-    }
-         
-   //console.log('touch move at ' + touchX + ' x ' + touchY);
-}, 0);
-
-canvas.addEventListener('touchend', function(e) {
-   var xDiff = touchStartX - touchEndedX
-   ,   yDiff = touchStartY - touchEndedY
-   ;
-      
-   if (state == 0) {
-      // we are in a main menu
-      //console.log('reached this point');
-      if (mouseX > playX && mouseY > playY + longIphone2 && mouseX < playX + loadedPictures.play.width + longIphone2 && mouseY < playY + loadedPictures.play.height + longIphone2) {
-         newGame();
-         state = 1;
-      } else {
-         //console.log('mouseX ' + mouseX + ' playX ' + playX + ' mouseY ' + mouseY + ' playY ' + playY);
-      }
-   } else if (state == 1) {
-      if (Math.abs(xDiff) > 10 || Math.abs(yDiff) > 10) {
-         if (Math.abs(xDiff) > Math.abs(yDiff)) {
-            if (xDiff < 0) {
-               moveRight();
-            } else {
-               moveLeft();
-            }
-         } else {
-            if (yDiff < 0) {
-               moveDown();
-            } else {
-               moveUp();
-            }
-         }
-      } else {
-         //console.log("ignoring gesture because it is too small");
-      }
-   } else if (state == 2) {
-      // we are in the game over screen
-      snakeDirection = 0;
-      snakeLength = 1;
-      state = 0;
-      newGame();
+function init2() {
+   console.log("init2()");
+   canvas = document.getElementById('canvas');
+   ctx = canvas.getContext("2d");
+   
+   pixelRatio = window.devicePixelRatio || 1;
+   
+   // choosing the right food image size
+   if (pixelRatio > 1) {
+      blockWidth = blockWidth * pixelRatio;
+      blockHeight = blockHeight * pixelRatio;
    }
+   
+   console.log("init2() trying to set canvas width and height");
+   console.log("init2() canvas.width before: " + canvas.width);
+   
+   canvas.style.width  = document.body.clientWidth;
+   canvas.style.height = document.body.clientHeight;
+   canvas.width        = document.body.clientWidth;
+   canvas.height       = document.body.clientHeight;
+   
+   console.log("init2() canvas.width after: " + canvas.width);
+   console.log("init2() document.body.clientWidth: " + document.body.clientWidth);
+   console.log("init2() document.body.clientHeight: " + document.body.clientHeight);
 
-      
-   //console.log("touchended, processing... (xDiff:" + xDiff + ", yDiff:" + yDiff + ")");
-}, 0);
+   if (pixelRatio > 1) {
+      canvas.setAttribute('width', canvas.width * pixelRatio);
+      canvas.setAttribute('height', canvas.height * pixelRatio);
+      ctx.scale(pixelRatio, pixelRatio);
+   }
+   
+   init3();
+}
 
-draw();
-setInterval(auto_move, autoMoveInterval);
+if (navigator.userAgent.search("Android") == -1) { 
+	console.log("Running on not Android");
 
-startLoadingImages();
+	var canvas = document.getElementById('canvas');
+	ctx = canvas.getContext("2d");
 
+	//ctx.imageSmoothingEnabled = true;
+
+	init3();
+}
+
+// http://creativejs.com/resources/requestanimationframe/
+// https://gist.github.com/paulirish/1579671
+// https://gist.github.com/rma4ok/3371337
+// requestAnimationFrame polyfill by @rma4ok
+!function (window) {
+   var
+      equestAnimationFrame = 'equestAnimationFrame',
+      requestAnimationFrame = 'r' + equestAnimationFrame,
+ 
+      ancelAnimationFrame = 'ancelAnimationFrame',
+      cancelAnimationFrame = 'c' + ancelAnimationFrame,
+ 
+      expectedTime = 0,
+      vendors = ['moz', 'ms', 'o', 'webkit'],
+      vendor;
+ 
+      while (!window[requestAnimationFrame] && (vendor = vendors.pop())) {
+         window[requestAnimationFrame] = window[vendor + 'R' + equestAnimationFrame];
+         window[cancelAnimationFrame] =
+         window[vendor + 'C' + ancelAnimationFrame] ||
+         window[vendor + 'CancelR' + equestAnimationFrame];
+      }
+ 
+      if (!window[requestAnimationFrame]) {
+         window[requestAnimationFrame] = function (callback) {
+            var
+               currentTime = +new Date,
+               adjustedDelay = 16 - (currentTime - expectedTime),
+               delay = adjustedDelay > 0 ? adjustedDelay : 0;
+ 
+               expectedTime = currentTime + delay;
+ 
+            return setTimeout(function () {
+               callback(expectedTime);
+            }, delay);
+      };
+ 
+      window[cancelAnimationFrame] = clearTimeout;
+   }
+}(this);
+
+
+// -------------------------------------------------------------------------------------
 
 function startLoadingImages() {
    for (var i=0; i<picturesToLoad.length; i++) {
@@ -358,7 +311,155 @@ function auto_move() {
    }
 }
 
-function recalculate() {
+function init3() {
+   picturesToLoad.push({ name: "food", picture: "food-01.png" });
+   
+   if (navigator.userAgent.search("Android")) {
+      console.log("init3(): -----------------------------------------");
+      console.log("init3(): canvas - " + canvas);
+      console.log("init3(): canvas.width - " + canvas.width);
+      console.log("init3(): ratio - " + pixelRatio);
+      
+      if (canvas.width < 1000) {
+         if (pixelRatio == 1) {
+            picturesToLoad.push({ name: "play",     picture: "play-iphone.png"        });
+            picturesToLoad.push({ name: "snake",    picture: "snake-iphone.png"       });
+            picturesToLoad.push({ name: "logo",     picture: "logo-iphone.png"        });
+            picturesToLoad.push({ name: "gameover", picture: "gameover-iphone.png"    });
+         } else {
+            picturesToLoad.push({ name: "play",     picture: "play-iphone@2x.png"        });
+            picturesToLoad.push({ name: "snake",    picture: "snake-iphone@2x.png"       });
+            picturesToLoad.push({ name: "logo",     picture: "logo-iphone@2x.png"        });
+            picturesToLoad.push({ name: "gameover", picture: "gameover-iphone@2x.png"    });
+         }
+      } else {
+         initialFoodCount = initialFoodCount + 20;
+         picturesToLoad.push({ name: "play",     picture: "play-ipad.png"          });
+         picturesToLoad.push({ name: "snake",    picture: "snake-ipad.png"         });
+         picturesToLoad.push({ name: "logo",     picture: "logo-ipad.png"          });
+         picturesToLoad.push({ name: "gameover", picture: "gameover-ipad.png"      });
+      }
+   } else {
+      var searchIphone = navigator.userAgent.search("iPhone");
+      
+      if (searchIphone > 0) {
+         picturesToLoad.push({ name: "play",     picture: "play-iphone.png"        });
+         picturesToLoad.push({ name: "snake",    picture: "snake-iphone.png"       });
+         picturesToLoad.push({ name: "logo",     picture: "logo-iphone.png"        });
+         picturesToLoad.push({ name: "gameover", picture: "gameover-iphone.png"    });
+      }
+      
+      var searchIpad = navigator.userAgent.search("iPad");
+      
+      if (searchIpad > 0) {
+         initialFoodCount = initialFoodCount + 20;
+         picturesToLoad.push({ name: "play",     picture: "play-ipad.png"          });
+         picturesToLoad.push({ name: "snake",    picture: "snake-ipad.png"         });
+         picturesToLoad.push({ name: "logo",     picture: "logo-ipad.png"          });
+         picturesToLoad.push({ name: "gameover", picture: "gameover-ipad.png"      });
+      }
+   }
+   
+
+   canvas.addEventListener('mousemove', function (e) {
+      mouseX = e.pageX - canvas.offsetLeft;
+      mouseY = e.pageY - canvas.offsetTop;
+      console.log("mousemove()");
+   }, 0);
+   
+   ctx.font = "11pt Calibri";
+   ctx.strokeStyle = "red";
+   
+   canvas.addEventListener('touchstart', function(e) {
+      touchStartX = e.touches[0].pageX;
+      touchStartY = e.touches[0].pageY;
+      mouseX = touchStartX;
+      mouseY = touchStartY;
+   }, 0);
+   
+   canvas.addEventListener('touchmove', function(e) {
+      touchEndedX = e.touches[0].pageX;
+      touchEndedY = e.touches[0].pageY;
+   
+      mouseX = touchEndedX;
+      mouseY = touchEndedY;
+   
+      var xDiff = touchStartX - touchEndedX
+      ,   yDiff = touchStartY - touchEndedY
+      ;
+   
+      if (Math.abs(xDiff) > 20 || Math.abs(yDiff) > 20) {
+         if (Math.abs(xDiff) > Math.abs(yDiff)) {
+            if (xDiff < 0) {
+               moveRight();
+            } else {
+               moveLeft();
+               }
+            } else {
+               if (yDiff < 0) {
+                  moveDown();
+               } else {
+                  moveUp();
+               }
+            }
+            
+          touchStartX = e.pageX - canvas.offsetLeft;
+          touchStartY = e.pageY - canvas.offsetTop;
+       } else {
+          //console.log("ignoring gesture because it is too small");
+       }
+            
+      //console.log('touch move at ' + touchX + ' x ' + touchY);
+   }, 0);
+   
+   canvas.addEventListener('touchend', function(e) {
+      var xDiff = touchStartX - touchEndedX
+      ,   yDiff = touchStartY - touchEndedY
+      ;
+         
+      if (state == 0) {
+         // we are in a main menu
+         //console.log('reached this point');
+         if (mouseX > playX && mouseY > playY + longIphone2 && mouseX < playX + loadedPictures.play.width + longIphone2 && mouseY < playY + loadedPictures.play.height + longIphone2) {
+            newGame();
+            state = 1;
+         } else {
+            //console.log('mouseX ' + mouseX + ' playX ' + playX + ' mouseY ' + mouseY + ' playY ' + playY);
+         }
+      } else if (state == 1) {
+         if (Math.abs(xDiff) > 10 || Math.abs(yDiff) > 10) {
+            if (Math.abs(xDiff) > Math.abs(yDiff)) {
+               if (xDiff < 0) {
+                  moveRight();
+               } else {
+                  moveLeft();
+               }
+            } else {
+               if (yDiff < 0) {
+                  moveDown();
+               } else {
+                  moveUp();
+               }
+            }
+         } else {
+            //console.log("ignoring gesture because it is too small");
+         }
+      } else if (state == 2) {
+         // we are in the game over screen
+         snakeDirection = 0;
+         snakeLength = 1;
+         state = 0;
+         newGame();
+      }
+         
+      //console.log("touchended, processing... (xDiff:" + xDiff + ", yDiff:" + yDiff + ")");
+   }, 0);
+   
+   draw();
+   setInterval(auto_move, autoMoveInterval);
+
+   startLoadingImages();
+   
    horizontalCount = Math.floor((canvas.width / pixelRatio - (borderSpacing*2)) / blockWidth);
    verticalCount = Math.floor((canvas.height / pixelRatio - (borderSpacing*2)) / blockHeight);
 }
@@ -371,8 +472,6 @@ function draw() {
    ctx.fillStyle = 'white';
    ctx.fillRect(0, 0, canvas.width, canvas.height);
    
-   
-   
    if (state == -1) {      
       if (loadedPicturesCounter < picturesToLoad.length) {
          // draw loading screen
@@ -381,20 +480,25 @@ function draw() {
          ctx.fillText('Pocket Snake is loading...', (canvas.width / 2) - 50, (canvas.height / 2) - 25);
       } else {
          // decide where to draw Play button
-         playX = (canvas.width - loadedPictures.play.width)/2;
-         playY =  35 + loadedPictures.logo.height + loadedPictures.snake.height;
+         playX = ((canvas.width/pixelRatio) - (loadedPictures.play.width/pixelRatio))/2;
+         playY =  35 + loadedPictures.logo.height/pixelRatio + loadedPictures.snake.height/pixelRatio;
          
          state = 0;
       }
    } else if (state == 0) {
       // draw main menu
-      if (canvas.height == 1136) {
+      if (canvas.height > 1100) {
          longIphone = 100;
-         longIphone2 = 200;
+         longIphone2 = 20;
       }
-      ctx.drawImage(loadedPictures.logo, (canvas.width - loadedPictures.logo.width)/2 , 20);
-      ctx.drawImage(loadedPictures.snake, (canvas.width - loadedPictures.snake.width)/2 , 30 + loadedPictures.logo.height + longIphone );
-      ctx.drawImage(loadedPictures.play, playX, playY + longIphone2 - 5);
+      
+      ctx.fillStyle = "black";
+      ctx.fillText("playX: " + playX + ", playY: " + playY, 5, 15);
+      ctx.fillText("logoX: " + ((canvas.width - loadedPictures.logo.width)/2)/pixelRatio, 5, 25);
+      
+      ctx.drawImage(loadedPictures.logo, ((canvas.width/pixelRatio - loadedPictures.logo.width/pixelRatio)/2), 20, loadedPictures.logo.width / pixelRatio, loadedPictures.logo.height / pixelRatio);
+      ctx.drawImage(loadedPictures.snake, ((canvas.width/pixelRatio - loadedPictures.snake.width/pixelRatio)/2), 30 + loadedPictures.logo.height/pixelRatio, loadedPictures.snake.width / pixelRatio, loadedPictures.snake.height / pixelRatio);
+      ctx.drawImage(loadedPictures.play, playX, playY + longIphone2 - 5, loadedPictures.play.width / pixelRatio, loadedPictures.play.height / pixelRatio);
       
       ctx.beginPath();
       ctx.arc(mouseX, mouseY, 3, 0, 6.28);
@@ -484,7 +588,7 @@ function draw() {
    }
    
    ctx.font = "8pt Calibri";
-   ctx.fillText(Math.floor(TTDFAA/TTDFarray.length) + " ms", canvas.width - 30, canvas.height-5);
+   ctx.fillText(Math.floor(TTDFAA/TTDFarray.length) + " ms", canvas.width - 30, 5);
 }
 
 function newGame() {
