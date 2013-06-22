@@ -1,4 +1,4 @@
-console.log("starting app...");
+//console.log("starting app...");
 
 var pixelRatio          = 1 // kuku
 ,   mouseX              = 0
@@ -19,8 +19,9 @@ var pixelRatio          = 1 // kuku
 ,   snake2X             = 0
 ,   snake2Y             = 0
 ,   snakeDirection      = 0
-,   state               = -1   //-1 - loading; 0 - main menu; 1 - plaing; 2 - game over
+,   state               = -1  //-1 - loading; 0 - main menu; 1 - plaing; 2 - game over
 ,   borderSpacing       = 10
+,   touchStartState     = 0
 ,   touchStartX         = 0   // touch sceen variables |
 ,   touchStartY         = 0   //                       |
 ,   touchEndedX         = 0   //                       |
@@ -44,7 +45,7 @@ var loadedPicturesCounter = 0;
 var mouseX = 0, mouseY = 0;
 
 function init2() {
-   console.log("init2()");
+   //console.log("init2()");
    canvas = document.getElementById('canvas');
    ctx = canvas.getContext("2d");
    
@@ -52,21 +53,21 @@ function init2() {
    
    // choosing the right food image size
    if (pixelRatio > 1) {
-      blockWidth = blockWidth * pixelRatio;
-      blockHeight = blockHeight * pixelRatio;
+      //blockWidth = blockWidth / pixelRatio;
+      //blockHeight = blockHeight / pixelRatio;
    }
    
-   console.log("init2() trying to set canvas width and height");
-   console.log("init2() canvas.width before: " + canvas.width);
+   //console.log("init2() trying to set canvas width and height");
+   //console.log("init2() canvas.width before: " + canvas.width);
    
    canvas.style.width  = document.body.clientWidth;
    canvas.style.height = document.body.clientHeight;
    canvas.width        = document.body.clientWidth;
    canvas.height       = document.body.clientHeight;
    
-   console.log("init2() canvas.width after: " + canvas.width);
-   console.log("init2() document.body.clientWidth: " + document.body.clientWidth);
-   console.log("init2() document.body.clientHeight: " + document.body.clientHeight);
+   //console.log("init2() canvas.width after: " + canvas.width);
+   //console.log("init2() document.body.clientWidth: " + document.body.clientWidth);
+   //console.log("init2() document.body.clientHeight: " + document.body.clientHeight);
 
    if (pixelRatio > 1) {
       canvas.setAttribute('width', canvas.width * pixelRatio);
@@ -74,11 +75,13 @@ function init2() {
       ctx.scale(pixelRatio, pixelRatio);
    }
    
+   borderSpacing = borderSpacing / pixelRatio;
+   
    init3();
 }
 
 if (navigator.userAgent.search("Android") == -1) { 
-	console.log("Running on not Android");
+	//console.log("Running on not Android");
 
 	var canvas = document.getElementById('canvas');
 	ctx = canvas.getContext("2d");
@@ -312,21 +315,19 @@ function auto_move() {
 }
 
 function init3() {
-   picturesToLoad.push({ name: "food", picture: "food-01.png" });
+   
    
    if (navigator.userAgent.search("Android")) {
-      console.log("init3(): -----------------------------------------");
-      console.log("init3(): canvas - " + canvas);
-      console.log("init3(): canvas.width - " + canvas.width);
-      console.log("init3(): ratio - " + pixelRatio);
-      
+            
       if (canvas.width < 1000) {
          if (pixelRatio == 1) {
+            picturesToLoad.push({ name: "food",     picture: "food-01.png" });
             picturesToLoad.push({ name: "play",     picture: "play-iphone.png"        });
             picturesToLoad.push({ name: "snake",    picture: "snake-iphone.png"       });
             picturesToLoad.push({ name: "logo",     picture: "logo-iphone.png"        });
             picturesToLoad.push({ name: "gameover", picture: "gameover-iphone.png"    });
          } else {
+            picturesToLoad.push({ name: "food",     picture: "food-01@2x.png" });  
             picturesToLoad.push({ name: "play",     picture: "play-iphone@2x.png"        });
             picturesToLoad.push({ name: "snake",    picture: "snake-iphone@2x.png"       });
             picturesToLoad.push({ name: "logo",     picture: "logo-iphone@2x.png"        });
@@ -340,6 +341,7 @@ function init3() {
          picturesToLoad.push({ name: "gameover", picture: "gameover-ipad.png"      });
       }
    } else {
+      picturesToLoad.push({ name: "food", picture: "food-01.png" });
       var searchIphone = navigator.userAgent.search("iPhone");
       
       if (searchIphone > 0) {
@@ -359,18 +361,19 @@ function init3() {
          picturesToLoad.push({ name: "gameover", picture: "gameover-ipad.png"      });
       }
    }
-   
 
-   canvas.addEventListener('mousemove', function (e) {
-      mouseX = e.pageX - canvas.offsetLeft;
-      mouseY = e.pageY - canvas.offsetTop;
-      console.log("mousemove()");
-   }, 0);
+   //canvas.addEventListener('mousemove', function (e) {
+   //   mouseX = e.pageX - canvas.offsetLeft;
+   //   mouseY = e.pageY - canvas.offsetTop;
+   //   console.log("mousemove()");
+   //}, 0);
    
    ctx.font = "11pt Calibri";
    ctx.strokeStyle = "red";
    
    canvas.addEventListener('touchstart', function(e) {
+      //console.log("moving - touchstart()");
+      touchStartState = state;
       touchStartX = e.touches[0].pageX;
       touchStartY = e.touches[0].pageY;
       mouseX = touchStartX;
@@ -378,6 +381,7 @@ function init3() {
    }, 0);
    
    canvas.addEventListener('touchmove', function(e) {
+      
       touchEndedX = e.touches[0].pageX;
       touchEndedY = e.touches[0].pageY;
    
@@ -387,32 +391,39 @@ function init3() {
       var xDiff = touchStartX - touchEndedX
       ,   yDiff = touchStartY - touchEndedY
       ;
+      
+      //console.log("moving touchmove() : touchStartX - " + touchStartX + ", touchEndedX - " + touchEndedX + ", touchStartY - " + touchStartY + ", touchEndedY - " + touchEndedY +", xDiff=" + xDiff + ', yDiff=' + yDiff);
    
       if (Math.abs(xDiff) > 20 || Math.abs(yDiff) > 20) {
          if (Math.abs(xDiff) > Math.abs(yDiff)) {
             if (xDiff < 0) {
                moveRight();
+               //console.log('moving Right xDiff=' + xDiff + ' yDiff=' + yDiff);
             } else {
                moveLeft();
-               }
-            } else {
-               if (yDiff < 0) {
-                  moveDown();
-               } else {
-                  moveUp();
-               }
+               //console.log('moving Left xDiff=' + xDiff + ' yDiff=' + yDiff);
             }
+         } else {
+            if (yDiff < 0) {
+               moveDown();
+               //console.log('moving Down xDiff=' + xDiff + ' yDiff=' + yDiff);
+            } else {
+               moveUp();
+               //console.log('moving Up xDiff=' + xDiff + ' yDiff=' + yDiff);
+            }
+         }
             
-          touchStartX = e.pageX - canvas.offsetLeft;
-          touchStartY = e.pageY - canvas.offsetTop;
-       } else {
-          //console.log("ignoring gesture because it is too small");
-       }
+         touchStartX = touchEndedX;
+         touchStartY = touchEndedY;
+      } else {
+         //console.log("ignoring gesture because it is too small");
+      }
             
       //console.log('touch move at ' + touchX + ' x ' + touchY);
    }, 0);
    
    canvas.addEventListener('touchend', function(e) {
+      //console.log("moving - touchend()");
       var xDiff = touchStartX - touchEndedX
       ,   yDiff = touchStartY - touchEndedY
       ;
@@ -446,10 +457,14 @@ function init3() {
          }
       } else if (state == 2) {
          // we are in the game over screen
-         snakeDirection = 0;
-         snakeLength = 1;
-         state = 0;
-         newGame();
+         
+         // we want touch event to work only if it was started when game over screen was active 
+         if (touchStartState == 2) {
+            snakeDirection = 0;
+            snakeLength = 1;
+            state = 0;
+            newGame();
+         }
       }
          
       //console.log("touchended, processing... (xDiff:" + xDiff + ", yDiff:" + yDiff + ")");
@@ -492,9 +507,9 @@ function draw() {
          longIphone2 = 20;
       }
       
-      ctx.fillStyle = "black";
-      ctx.fillText("playX: " + playX + ", playY: " + playY, 5, 15);
-      ctx.fillText("logoX: " + ((canvas.width - loadedPictures.logo.width)/2)/pixelRatio, 5, 25);
+      //ctx.fillStyle = "black";
+      //ctx.fillText("playX: " + playX + ", playY: " + playY, 5, 15);
+      //ctx.fillText("logoX: " + ((canvas.width - loadedPictures.logo.width)/2)/pixelRatio, 5, 25);
       
       ctx.drawImage(loadedPictures.logo, ((canvas.width/pixelRatio - loadedPictures.logo.width/pixelRatio)/2), 20, loadedPictures.logo.width / pixelRatio, loadedPictures.logo.height / pixelRatio);
       ctx.drawImage(loadedPictures.snake, ((canvas.width/pixelRatio - loadedPictures.snake.width/pixelRatio)/2), 30 + loadedPictures.logo.height/pixelRatio, loadedPictures.snake.width / pixelRatio, loadedPictures.snake.height / pixelRatio);
@@ -509,13 +524,12 @@ function draw() {
    } else if (state == 1) {
       // playing
       ctx.fillStyle = "#2cba30";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillRect(0, 0, canvas.width/pixelRatio, canvas.height/pixelRatio);
 
       ctx.fillStyle = "#79d87b";
-      ctx.fillRect(borderSpacing, borderSpacing, canvas.width-borderSpacing*2, (canvas.height-borderSpacing*4) + borderSpacing);
+      ctx.fillRect(borderSpacing, borderSpacing, canvas.width/pixelRatio-borderSpacing*2, canvas.height/pixelRatio-borderSpacing*3);
 
       // drawing the snake
-      
       for (var y=0; y<verticalCount; y++) {
          for (var x=0; x<horizontalCount; x++) {
             
@@ -523,34 +537,80 @@ function draw() {
                // calculate block coordinates
                var rectX = (Math.ceil(x*blockWidth)+0.5);
                var rectY = (Math.ceil(y*blockHeight)+0.5);
-
+               //var fill = "none";
+               
+               // only if this is a head we draw eyes, nose and toung
+               if (snake[y][x] == 1) {
+                  ctx.beginPath();
+                  ctx.strokeStyle = "black";
+            
+                  ctx.moveTo((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2);
+                  
+                  if (snakeDirection == 4 || snakeDirection == 0) { // up
+                     ctx.lineTo((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2 - 10);
+                     
+                     ctx.lineTo((rectX+borderSpacing) + blockWidth/2 + 5, (rectY+borderSpacing) + blockHeight/2 - 15);
+                     ctx.moveTo((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2 - 10);
+                     ctx.lineTo((rectX+borderSpacing) + blockWidth/2 - 5, (rectY+borderSpacing) + blockHeight/2 - 15);
+                  } else if (snakeDirection == 3) { // right
+                     ctx.lineTo(((rectX+borderSpacing) + blockWidth/2) + 10, (rectY+borderSpacing) + blockHeight/2);
+                     ctx.lineTo((rectX+borderSpacing) + blockWidth/2 + 5, (rectY+borderSpacing) + blockHeight/2 + 15);
+//
+//                  ctx.moveTo((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2 + 20);
+//                   ctx.lineTo((rectX+borderSpacing) + blockWidth/2 - 10, (rectY+borderSpacing) + blockHeight/2 + 30);
+               } // else if (snakeDirection == 2) {
+//                   ctx.lineTo((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2 + 20);
+//                   ctx.lineTo((rectX+borderSpacing) + blockWidth/2 + 10, (rectY+borderSpacing) + blockHeight/2 + 30);
+// 
+//                   ctx.moveTo((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2 + 20);
+//                   ctx.lineTo((rectX+borderSpacing) + blockWidth/2 - 10, (rectY+borderSpacing) + blockHeight/2 + 30);
+//                } else if (snakeDirection == 1) {
+//                   ctx.lineTo((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2 + 20);
+//                   ctx.lineTo((rectX+borderSpacing) + blockWidth/2 + 10, (rectY+borderSpacing) + blockHeight/2 + 30);
+// 
+//                   ctx.moveTo((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2 + 20);
+//                   ctx.lineTo((rectX+borderSpacing) + blockWidth/2 - 10, (rectY+borderSpacing) + blockHeight/2 + 30);
+//                }
+               
+                  ctx.stroke();
+                  ctx.closePath();
+               }
+               
                ctx.beginPath();
-               ctx.fillStyle = "white";
-            ctx.rect(rectX+borderSpacing, rectY+borderSpacing, blockWidth, blockHeight);
-               ctx.fill();
+               
+               //ctx.rect(rectX+borderSpacing, rectY+borderSpacing, blockWidth, blockHeight);
+               //ctx.fillStyle = "Red";
+               
+               if (snake[y][x] == 1) {
+                  ctx.fillStyle = "white";
+               } else {
+                  ctx.fillStyle = "red";
+               }
+               
+               ctx.arc((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2, blockWidth/2, 0, 2 * Math.PI);
+               //ctx.fill();
+               ctx.stroke();
                ctx.closePath();
+               
             } else {
                //ctx.strokeStyle = "#79d87b";
             }
 
-            //ctx.stroke();
          }
       }
       
-
+      // drawing food
       for (var y=0; y<verticalCount; y++) {
          for (var x=0; x<horizontalCount; x++) {
             if(food[y][x]) {
-               ctx.drawImage(loadedPictures.food, Math.ceil(x*blockWidth)+borderSpacing, Math.ceil(y*blockHeight)+borderSpacing, loadedPictures.food.width/2, loadedPictures.food.height/2);
+               ctx.drawImage(loadedPictures.food, Math.ceil(x*blockWidth)+borderSpacing, Math.ceil(y*blockHeight)+borderSpacing, blockWidth, blockHeight);
             }
          }
       }
       
-
-      
       ctx.fillStyle = "white";
-      ctx.font = "13pt Calibri";
-      ctx.fillText('Length: ' + snakeLength, 10, canvas.height-5);
+      ctx.font = "8pt Calibri";
+      ctx.fillText('Length: ' + snakeLength, 10/pixelRatio, canvas.height/pixelRatio-3);
 
        //display frame frate in the corner
        //ctx.fillStyle = "white";
@@ -565,7 +625,7 @@ function draw() {
       }
       
    } else if (state == 2) {
-      ctx.drawImage(loadedPictures.gameover, (canvas.width - loadedPictures.gameover.width)/2 , 20);
+      ctx.drawImage(loadedPictures.gameover, ((canvas.width/pixelRatio - loadedPictures.gameover.width/pixelRatio)/2) , 20, loadedPictures.gameover.width / pixelRatio, loadedPictures.gameover.height / pixelRatio);
 
    
    } else {
@@ -587,8 +647,8 @@ function draw() {
       TTDFarray.shift();
    }
    
-   ctx.font = "8pt Calibri";
-   ctx.fillText(Math.floor(TTDFAA/TTDFarray.length) + " ms", canvas.width - 30, 5);
+   //ctx.font = "8pt Calibri";
+   //ctx.fillText(Math.floor(TTDFAA/TTDFarray.length) + " ms", canvas.width - 30, 5);
 }
 
 function newGame() {
