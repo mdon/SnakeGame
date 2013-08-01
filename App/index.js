@@ -539,7 +539,7 @@ function draw() {
                var rectY = (Math.ceil(y*blockHeight)+0.5);
                //var fill = "none";
                
-               // only if this is a head we draw eyes, nose and toung
+               // only if this is a head we draw toung
                if (snake[y][x] == 1) {
                   ctx.beginPath();
                   ctx.strokeStyle = "black";
@@ -548,29 +548,29 @@ function draw() {
                   
                   if (snakeDirection == 4 || snakeDirection == 0) { // up
                      ctx.lineTo((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2 - 10);
-                     
                      ctx.lineTo((rectX+borderSpacing) + blockWidth/2 + 5, (rectY+borderSpacing) + blockHeight/2 - 15);
+                     
                      ctx.moveTo((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2 - 10);
                      ctx.lineTo((rectX+borderSpacing) + blockWidth/2 - 5, (rectY+borderSpacing) + blockHeight/2 - 15);
                   } else if (snakeDirection == 3) { // right
                      ctx.lineTo(((rectX+borderSpacing) + blockWidth/2) + 10, (rectY+borderSpacing) + blockHeight/2);
+                     ctx.lineTo((rectX+borderSpacing) + blockWidth/2 + 15, (rectY+borderSpacing) + blockHeight/2 + 5);
+
+                     ctx.moveTo(((rectX+borderSpacing) + blockWidth/2) + 10, (rectY+borderSpacing) + blockHeight/2);
+                     ctx.lineTo(((rectX+borderSpacing) + blockWidth/2) + 15, (rectY+borderSpacing) + blockHeight/2 - 5);
+                  } else if (snakeDirection == 2) { // down
+                     ctx.lineTo((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2 + 10);
                      ctx.lineTo((rectX+borderSpacing) + blockWidth/2 + 5, (rectY+borderSpacing) + blockHeight/2 + 15);
-//
-//                  ctx.moveTo((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2 + 20);
-//                   ctx.lineTo((rectX+borderSpacing) + blockWidth/2 - 10, (rectY+borderSpacing) + blockHeight/2 + 30);
-               } // else if (snakeDirection == 2) {
-//                   ctx.lineTo((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2 + 20);
-//                   ctx.lineTo((rectX+borderSpacing) + blockWidth/2 + 10, (rectY+borderSpacing) + blockHeight/2 + 30);
-// 
-//                   ctx.moveTo((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2 + 20);
-//                   ctx.lineTo((rectX+borderSpacing) + blockWidth/2 - 10, (rectY+borderSpacing) + blockHeight/2 + 30);
-//                } else if (snakeDirection == 1) {
-//                   ctx.lineTo((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2 + 20);
-//                   ctx.lineTo((rectX+borderSpacing) + blockWidth/2 + 10, (rectY+borderSpacing) + blockHeight/2 + 30);
-// 
-//                   ctx.moveTo((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2 + 20);
-//                   ctx.lineTo((rectX+borderSpacing) + blockWidth/2 - 10, (rectY+borderSpacing) + blockHeight/2 + 30);
-//                }
+ 
+                     ctx.moveTo((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2 + 10);
+                     ctx.lineTo((rectX+borderSpacing) + blockWidth/2 - 5, (rectY+borderSpacing) + blockHeight/2 + 15);
+                  } else if (snakeDirection == 1) { // left
+                     ctx.lineTo((rectX+borderSpacing) + blockWidth/2 - 10, (rectY+borderSpacing) + blockHeight/2);
+                     ctx.lineTo((rectX+borderSpacing) + blockWidth/2 - 15, (rectY+borderSpacing) + blockHeight/2 + 5);
+   
+                     ctx.moveTo((rectX+borderSpacing) + blockWidth/2 - 10, (rectY+borderSpacing) + blockHeight/2);
+                     ctx.lineTo((rectX+borderSpacing) + blockWidth/2 - 15, (rectY+borderSpacing) + blockHeight/2 - 5);
+                  }
                
                   ctx.stroke();
                   ctx.closePath();
@@ -588,8 +588,8 @@ function draw() {
                }
                
                ctx.arc((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2, blockWidth/2, 0, 2 * Math.PI);
-               //ctx.fill();
-               ctx.stroke();
+               ctx.fill();
+               //ctx.stroke();
                ctx.closePath();
                
             } else {
