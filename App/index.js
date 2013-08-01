@@ -547,27 +547,27 @@ function draw() {
                   ctx.moveTo((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2);
                   
                   if (snakeDirection == 4 || snakeDirection == 0) { // up
+                     // tonge
                      ctx.lineTo((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2 - 10);
                      ctx.lineTo((rectX+borderSpacing) + blockWidth/2 + 5, (rectY+borderSpacing) + blockHeight/2 - 15);
-                     
                      ctx.moveTo((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2 - 10);
                      ctx.lineTo((rectX+borderSpacing) + blockWidth/2 - 5, (rectY+borderSpacing) + blockHeight/2 - 15);
                   } else if (snakeDirection == 3) { // right
+                     // tonge
                      ctx.lineTo(((rectX+borderSpacing) + blockWidth/2) + 10, (rectY+borderSpacing) + blockHeight/2);
                      ctx.lineTo((rectX+borderSpacing) + blockWidth/2 + 15, (rectY+borderSpacing) + blockHeight/2 + 5);
-
                      ctx.moveTo(((rectX+borderSpacing) + blockWidth/2) + 10, (rectY+borderSpacing) + blockHeight/2);
                      ctx.lineTo(((rectX+borderSpacing) + blockWidth/2) + 15, (rectY+borderSpacing) + blockHeight/2 - 5);
                   } else if (snakeDirection == 2) { // down
+                     // tonge
                      ctx.lineTo((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2 + 10);
                      ctx.lineTo((rectX+borderSpacing) + blockWidth/2 + 5, (rectY+borderSpacing) + blockHeight/2 + 15);
- 
                      ctx.moveTo((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2 + 10);
                      ctx.lineTo((rectX+borderSpacing) + blockWidth/2 - 5, (rectY+borderSpacing) + blockHeight/2 + 15);
                   } else if (snakeDirection == 1) { // left
+                     // tonge
                      ctx.lineTo((rectX+borderSpacing) + blockWidth/2 - 10, (rectY+borderSpacing) + blockHeight/2);
                      ctx.lineTo((rectX+borderSpacing) + blockWidth/2 - 15, (rectY+borderSpacing) + blockHeight/2 + 5);
-   
                      ctx.moveTo((rectX+borderSpacing) + blockWidth/2 - 10, (rectY+borderSpacing) + blockHeight/2);
                      ctx.lineTo((rectX+borderSpacing) + blockWidth/2 - 15, (rectY+borderSpacing) + blockHeight/2 - 5);
                   }
@@ -589,8 +589,71 @@ function draw() {
                
                ctx.arc((rectX+borderSpacing) + blockWidth/2, (rectY+borderSpacing) + blockHeight/2, blockWidth/2, 0, 2 * Math.PI);
                ctx.fill();
-               //ctx.stroke();
+               
+               //drawing the eyes
+               
                ctx.closePath();
+               if (snake[y][x] == 1) {
+                  if (snakeDirection == 4 || snakeDirection == 0) { // up
+                        // eyes
+                        ctx.beginPath();
+                        ctx.arc((rectX+borderSpacing) + blockWidth/2 + 4, ((rectY+borderSpacing) + blockHeight/2) - 3, 1, 0, 2 * Math.PI, false);
+                        ctx.fillStyle = "black";
+                        ctx.fill();
+                        ctx.closePath();
+                  
+                        //ctx.beginPath();
+                        ctx.arc(((rectX+borderSpacing) + blockWidth/2) - 4, ((rectY+borderSpacing) + blockHeight/2) - 3, 1, 0, 2 * Math.PI, false);
+                        ctx.fillStyle = "black";
+                        ctx.fill();
+                        ctx.closePath();
+                     } else if (snakeDirection == 3) { // right
+                        // eyes
+                        ctx.beginPath();
+                        ctx.arc((rectX+borderSpacing) + blockWidth/2 + 5, ((rectY+borderSpacing) + blockHeight/2) - 3, 1, 0, 2 * Math.PI, false);
+                        ctx.fillStyle = "black";
+                        ctx.fill();
+                        ctx.closePath();
+                  
+                        //ctx.beginPath();
+                        ctx.arc(((rectX+borderSpacing) + blockWidth/2) + 5, ((rectY+borderSpacing) + blockHeight/2) + 3, 1, 0, 2 * Math.PI, false);
+                        ctx.fillStyle = "black";
+                        ctx.fill();
+                        ctx.closePath();
+
+                     } else if (snakeDirection == 2) { // down
+                        // eyes
+                        ctx.beginPath();
+                        ctx.arc((rectX+borderSpacing) + blockWidth/2 + 5, ((rectY+borderSpacing) + blockHeight/2) - 3, 1, 0, 2 * Math.PI, false);
+                        ctx.fillStyle = "black";
+                        ctx.fill();
+                        ctx.closePath();
+                  
+                        //ctx.beginPath();
+                        ctx.arc(((rectX+borderSpacing) + blockWidth/2) + 5, ((rectY+borderSpacing) + blockHeight/2) + 3, 1, 0, 2 * Math.PI, false);
+                        ctx.fillStyle = "black";
+                        ctx.fill();
+                        ctx.closePath();
+
+                     } else if (snakeDirection == 1) { // left
+                        // eyes
+                        ctx.beginPath();
+                        ctx.arc((rectX+borderSpacing) + blockWidth/2 + 5, ((rectY+borderSpacing) + blockHeight/2) - 3, 1, 0, 2 * Math.PI, false);
+                        ctx.fillStyle = "black";
+                        ctx.fill();
+                        ctx.closePath();
+                  
+                        //ctx.beginPath();
+                        ctx.arc(((rectX+borderSpacing) + blockWidth/2) + 5, ((rectY+borderSpacing) + blockHeight/2) + 3, 1, 0, 2 * Math.PI, false);
+                        ctx.fillStyle = "black";
+                        ctx.fill();
+                        ctx.closePath();
+
+                  }
+               }
+
+               
+               
                
             } else {
                //ctx.strokeStyle = "#79d87b";
