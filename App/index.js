@@ -36,6 +36,7 @@ var pixelRatio          = 1 // kuku
 ,   pixelRatio2         = 0
 ,   TTDF                = 0   // Time To Draw Frame
 ,   TTDFarray           = []
+,   EDFE                = 1   // EyesDistanseFromEdge
 ;
 
 var picturesToLoad = [];
@@ -597,26 +598,24 @@ function draw() {
                   if (snakeDirection == 4 || snakeDirection == 0) { // up
                         // eyes
                         ctx.beginPath();
-                        ctx.arc((rectX+borderSpacing) + blockWidth/2 + 4, ((rectY+borderSpacing) + blockHeight/2) - 3, 1, 0, 2 * Math.PI, false);
+                        ctx.arc((rectX+borderSpacing) + blockWidth/2 + (5 - EDFE), ((rectY+borderSpacing) + blockHeight/2) - 3, 1, 0, 2 * Math.PI, false);
                         ctx.fillStyle = "black";
                         ctx.fill();
                         ctx.closePath();
                   
-                        //ctx.beginPath();
-                        ctx.arc(((rectX+borderSpacing) + blockWidth/2) - 4, ((rectY+borderSpacing) + blockHeight/2) - 3, 1, 0, 2 * Math.PI, false);
+                        ctx.arc(((rectX+borderSpacing) + blockWidth/2) - (5 - EDFE), ((rectY+borderSpacing) + blockHeight/2) - 3, 1, 0, 2 * Math.PI, false);
                         ctx.fillStyle = "black";
                         ctx.fill();
                         ctx.closePath();
                      } else if (snakeDirection == 3) { // right
                         // eyes
                         ctx.beginPath();
-                        ctx.arc((rectX+borderSpacing) + blockWidth/2 + 5, ((rectY+borderSpacing) + blockHeight/2) - 3, 1, 0, 2 * Math.PI, false);
+                        ctx.arc((rectX+borderSpacing) + blockWidth/2 + (5 - EDFE), ((rectY+borderSpacing) + blockHeight/2) - 3, 1, 0, 2 * Math.PI, false);
                         ctx.fillStyle = "black";
                         ctx.fill();
                         ctx.closePath();
                   
-                        //ctx.beginPath();
-                        ctx.arc(((rectX+borderSpacing) + blockWidth/2) + 5, ((rectY+borderSpacing) + blockHeight/2) + 3, 1, 0, 2 * Math.PI, false);
+                        ctx.arc(((rectX+borderSpacing) + blockWidth/2) + (5 - EDFE), ((rectY+borderSpacing) + blockHeight/2) + 3, 1, 0, 2 * Math.PI, false);
                         ctx.fillStyle = "black";
                         ctx.fill();
                         ctx.closePath();
@@ -624,13 +623,12 @@ function draw() {
                      } else if (snakeDirection == 2) { // down
                         // eyes
                         ctx.beginPath();
-                        ctx.arc((rectX+borderSpacing) + blockWidth/2 + 5, ((rectY+borderSpacing) + blockHeight/2) - 3, 1, 0, 2 * Math.PI, false);
+                        ctx.arc((rectX+borderSpacing) + blockWidth/2 - (5 - EDFE), ((rectY+borderSpacing) + blockHeight/2) + 3, 1, 0, 2 * Math.PI, false);
                         ctx.fillStyle = "black";
                         ctx.fill();
                         ctx.closePath();
                   
-                        //ctx.beginPath();
-                        ctx.arc(((rectX+borderSpacing) + blockWidth/2) + 5, ((rectY+borderSpacing) + blockHeight/2) + 3, 1, 0, 2 * Math.PI, false);
+                        ctx.arc(((rectX+borderSpacing) + blockWidth/2) + (5 - EDFE), ((rectY+borderSpacing) + blockHeight/2) + 3, 1, 0, 2 * Math.PI, false);
                         ctx.fillStyle = "black";
                         ctx.fill();
                         ctx.closePath();
@@ -638,13 +636,12 @@ function draw() {
                      } else if (snakeDirection == 1) { // left
                         // eyes
                         ctx.beginPath();
-                        ctx.arc((rectX+borderSpacing) + blockWidth/2 + 5, ((rectY+borderSpacing) + blockHeight/2) - 3, 1, 0, 2 * Math.PI, false);
+                        ctx.arc((rectX+borderSpacing) + blockWidth/2 - (5 - EDFE), ((rectY+borderSpacing) + blockHeight/2) - 3, 1, 0, 2 * Math.PI, false);
                         ctx.fillStyle = "black";
                         ctx.fill();
                         ctx.closePath();
                   
-                        //ctx.beginPath();
-                        ctx.arc(((rectX+borderSpacing) + blockWidth/2) + 5, ((rectY+borderSpacing) + blockHeight/2) + 3, 1, 0, 2 * Math.PI, false);
+                        ctx.arc(((rectX+borderSpacing) + blockWidth/2) - (5 - EDFE), ((rectY+borderSpacing) + blockHeight/2) + 3, 1, 0, 2 * Math.PI, false);
                         ctx.fillStyle = "black";
                         ctx.fill();
                         ctx.closePath();
