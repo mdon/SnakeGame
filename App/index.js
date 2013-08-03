@@ -317,9 +317,10 @@ function auto_move() {
 
 function init3() {
    
+   var searchAndroid = navigator.userAgent.search("Android");
    
-   if (navigator.userAgent.search("Android")) {
-            
+   if (searchAndroid > 0) {
+      console.log("hello1");
       if (canvas.width < 1000) {
          if (pixelRatio == 1) {
             picturesToLoad.push({ name: "food",     picture: "food-01.png" });
@@ -346,6 +347,7 @@ function init3() {
       var searchIphone = navigator.userAgent.search("iPhone");
       
       if (searchIphone > 0) {
+         console.log("hello2");
          picturesToLoad.push({ name: "play",     picture: "play-iphone.png"        });
          picturesToLoad.push({ name: "snake",    picture: "snake-iphone.png"       });
          picturesToLoad.push({ name: "logo",     picture: "logo-iphone.png"        });
@@ -355,6 +357,7 @@ function init3() {
       var searchIpad = navigator.userAgent.search("iPad");
       
       if (searchIpad > 0) {
+         console.log("hello3");
          initialFoodCount = initialFoodCount + 20;
          picturesToLoad.push({ name: "play",     picture: "play-ipad.png"          });
          picturesToLoad.push({ name: "snake",    picture: "snake-ipad.png"         });
